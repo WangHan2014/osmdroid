@@ -1,6 +1,5 @@
 package org.osmdroid;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -8,32 +7,47 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 /**
  * created on 1/14/2017.
  *
  * @author Alex O'Ree
  */
 
-public class LicenseActivity extends Activity implements AdapterView.OnItemSelectedListener {
+public class LicenseActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     TextView license;
     String[] values = new String[]{
-        "osmdroid", "geopackage",
-        "mapsforge", "ACRA", "leakcanary", "ormlite", "pngj"
+            "osmdroid", "geopackage",
+            "mapsforge", "ACRA", "leakcanary", "ormlite", "pngj"
     };
-
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_license);
+
+        Toolbar toolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
+
+        //noinspection ConstantConditions
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         Spinner spinner = findViewById(R.id.license_module_spinner);
-        ArrayAdapter<String> array = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, values);
+        ArrayAdapter<String> array = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, values);
         array.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(array);
         license = findViewById(R.id.license_body);
         spinner.setOnItemSelectedListener(this);
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -59,7 +73,6 @@ public class LicenseActivity extends Activity implements AdapterView.OnItemSelec
             case 6:
                 license.setText(R.string.license_pngj);
                 break;
-
         }
     }
 
@@ -67,5 +80,4 @@ public class LicenseActivity extends Activity implements AdapterView.OnItemSelec
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
-
 }

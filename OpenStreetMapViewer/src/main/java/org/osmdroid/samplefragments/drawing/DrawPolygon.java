@@ -23,6 +23,7 @@ import static org.osmdroid.samplefragments.events.SampleMapEventListener.df;
 /**
  * created on 8/26/2017.
  * Map replication is ON for this sample (only viewable for numerically lower zoom levels (higher altitude))
+ *
  * @author Alex O'Ree
  */
 
@@ -76,6 +77,7 @@ public class DrawPolygon extends BaseSampleFragment implements View.OnClickListe
         paint = v.findViewById(R.id.paintingSurface);
         paint.init(mMapView);
         paint.setMode(CustomPaintingSurface.Mode.Polygon);
+        updateInfo();
         return v;
 
     }
@@ -83,8 +85,8 @@ public class DrawPolygon extends BaseSampleFragment implements View.OnClickListe
     private void updateInfo() {
         IGeoPoint mapCenter = mMapView.getMapCenter();
         textViewCurrentLocation.setText(df.format(mapCenter.getLatitude()) + "," +
-            df.format(mapCenter.getLongitude())
-            + ",zoom=" + mMapView.getZoomLevelDouble() + ",angle=" + mMapView.getMapOrientation());
+                df.format(mapCenter.getLongitude())
+                + ",zoom=" + mMapView.getZoomLevelDouble() + ",angle=" + mMapView.getMapOrientation() + "\nBounds: " + mMapView.getBoundingBox().toString());
 
     }
 

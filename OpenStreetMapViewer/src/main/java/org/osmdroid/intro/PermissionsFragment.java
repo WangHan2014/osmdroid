@@ -5,13 +5,12 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.osmdroid.R;
 import org.osmdroid.config.Configuration;
@@ -20,6 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 /**
  * created on 1/5/2017.
@@ -35,7 +37,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.intro_permissions, container,false);
+        View v = inflater.inflate(R.layout.intro_permissions, container, false);
         if (Build.VERSION.SDK_INT >= 23 && needsPermissions()) {
             v.findViewById(R.id.askPermissions).setOnClickListener(this);
             v.findViewById(R.id.askPermissions).setVisibility(View.VISIBLE);
@@ -57,26 +59,26 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
 
-
     // START PERMISSION CHECK
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
 
     private boolean needsPermissions() {
 
-            List<String> permissions = new ArrayList<>();
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-            }
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        List<String> permissions = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-            }
-            if (permissions.isEmpty()) {
-                return false;
-            } // else: We already have permissions, so handle as normal
+        }
+        if (permissions.isEmpty()) {
+            return false;
+        } // else: We already have permissions, so handle as normal
         return true;
 
     }
+
     private void checkPermissions() {
         List<String> permissions = new ArrayList<>();
         String message = "osmdroid permissions:";
@@ -120,7 +122,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 } else { // !location && !storage case
                     // Permission Denied
                     Toast.makeText(getContext(), "Storage permission is required to store map tiles to reduce data usage and for offline usage." +
-                        "\nLocation permission is required to show the user's location on map.", Toast.LENGTH_SHORT).show();
+                            "\nLocation permission is required to show the user's location on map.", Toast.LENGTH_SHORT).show();
                 }
                 Configuration.getInstance().load(getContext(), PreferenceManager.getDefaultSharedPreferences(getContext()));
             }

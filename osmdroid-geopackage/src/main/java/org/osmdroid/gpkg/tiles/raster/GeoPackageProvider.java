@@ -20,11 +20,10 @@ import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
 import org.osmdroid.util.BoundingBox;
 
 import java.io.File;
-import java.util.Iterator;
 
 import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.tiles.user.TileDao;
+import mil.nga.proj.ProjectionTransform;
 
 /**
  * GeoPackage +
@@ -40,7 +39,7 @@ public class GeoPackageProvider extends MapTileProviderArray implements IMapTile
 
     public GeoPackageProvider(File[] db, Context context) {
         this(new SimpleRegisterReceiver(context), new NetworkAvailabliltyCheck(context),
-            TileSourceFactory.DEFAULT_TILE_SOURCE, context, null, db);
+                TileSourceFactory.DEFAULT_TILE_SOURCE, context, null, db);
     }
 
 
@@ -69,7 +68,7 @@ public class GeoPackageProvider extends MapTileProviderArray implements IMapTile
 
     }
 
-    public GeoPackageMapTileModuleProvider geoPackageMapTileModuleProvider(){
+    public GeoPackageMapTileModuleProvider geoPackageMapTileModuleProvider() {
         return geopackage;
     }
 
@@ -91,9 +90,7 @@ public class GeoPackageProvider extends MapTileProviderArray implements IMapTile
     }
 
     public GeopackageRasterTileSource getTileSource(String database, String table) {
-        Iterator<GeoPackage> iterator = geopackage.tileSources.iterator();
-        while (iterator.hasNext()){
-            GeoPackage next = iterator.next();
+        for (GeoPackage next : geopackage.tileSources) {
             if (next.getName().equalsIgnoreCase(database)) {
                 //found the database
                 if (next.getTileTables().contains(table)) {
@@ -101,9 +98,10 @@ public class GeoPackageProvider extends MapTileProviderArray implements IMapTile
                     TileDao tileDao = next.getTileDao(table);
                     mil.nga.geopackage.BoundingBox boundingBox = tileDao.getBoundingBox();
                     ProjectionTransform transformation = tileDao.getProjection().getTransformation(tileDao.getProjection());
-                    boundingBox=transformation.transform(boundingBox);
-                    BoundingBox bounds =new BoundingBox(boundingBox.getMaxLatitude(),boundingBox.getMaxLongitude(),boundingBox.getMinLatitude(),boundingBox.getMinLongitude());
-                    return new GeopackageRasterTileSource(database,table, (int)tileDao.getMinZoom(),(int)tileDao.getMaxZoom(), bounds);
+                    double[] transformed = transformation.transform(boundingBox.getMinLongitude(), boundingBox.getMinLatitude(), boundingBox.getMaxLongitude(), boundingBox.getMaxLatitude());
+                    boundingBox = new mil.nga.geopackage.BoundingBox(transformed[0], transformed[1], transformed[2], transformed[3]);
+                    BoundingBox bounds = new BoundingBox(boundingBox.getMaxLatitude(), boundingBox.getMaxLongitude(), boundingBox.getMinLatitude(), boundingBox.getMinLongitude());
+                    return new GeopackageRasterTileSource(database, table, (int) tileDao.getMinZoom(), (int) tileDao.getMaxZoom(), bounds);
                 }
             }
         }

@@ -2,9 +2,6 @@ package org.osmdroid.samplefragments.layouts;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +11,13 @@ import org.osmdroid.samplefragments.BaseSampleFragment;
 import org.osmdroid.samplefragments.layouts.list.MyStreetAddressRecyclerViewAdapter;
 import org.osmdroid.samplefragments.layouts.list.dummy.DummyContent;
 
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * A fragment representing a list of Items.
  * 99% is this is boiler plate android studio generated stuff
-
  */
 public class StreetAddressFragment extends BaseSampleFragment {
 

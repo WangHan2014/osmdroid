@@ -1,4 +1,7 @@
-# osmdroid [![Build Status](https://api.travis-ci.org/osmdroid/osmdroid.svg?branch=master)](https://travis-ci.org/osmdroid/osmdroid) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.osmdroid/osmdroid-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.osmdroid/osmdroid-android) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-osmdroid-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/279)
+StandWithUkraine:
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
+
+# osmdroid [![Build Status](https://api.travis-ci.org/osmdroid/osmdroid.svg?branch=master)](https://travis-ci.org/osmdroid/osmdroid) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.osmdroid/osmdroid-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.osmdroid/osmdroid-android) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-osmdroid-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/279) [![SourceSpy Dashboard](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/osmdroidosmdroid/)
 
 osmdroid is a (almost) full/free replacement for Android's MapView (v1 API) class. It also includes a modular tile provider system with support for numerous online and offline tile sources and overlay support with built-in overlays for plotting icons, tracking location, and drawing shapes.
 
@@ -7,11 +10,11 @@ osmdroid is a (almost) full/free replacement for Android's MapView (v1 API) clas
 <a href="https://play.google.com/store/apps/details?id=org.osmdroid">
 <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on F-Droid" height="90"></a>
 
-Current Release: **6.1.0 Mar 24st, 2019**
+Current Release: **6.1.16 Mar 31, 2023**
 
-Current Development version: 6.1.1-SNAPSHOT
+Current Development version: 6.1.17-SNAPSHOT
 
-Next Release Version (planned): 6.1.1
+Next Release Version (planned): 6.1.17
 
 Note: check your calendar, it may take up to a few days for all global mirrors to update.
 
@@ -24,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.osmdroid:osmdroid-android:<VERSION>'
+    implementation 'org.osmdroid:osmdroid-android:<VERSION>'
 }
 ```
 
@@ -42,6 +45,9 @@ Be sure to replace `<VERSION>` with the last release version above.
 ```
 
 **Platform or API Level (API level 8 = Platform 2.2)**
+
+Note: this just assumes you need just osmdroid-android. Other modules require higher min SDK levels.
+
 ```xml
 <platform>8</platform>
 ```
@@ -61,7 +67,7 @@ repositories {
     }
 }
 dependencies {
-    compile 'org.osmdroid:osmdroid-android:<VERSION>-SNAPSHOT:debug@aar'
+    implementation 'org.osmdroid:osmdroid-android:<VERSION>-SNAPSHOT:debug@aar'
 }
 ```
 
@@ -88,7 +94,7 @@ You can also build your project using the gradle option `--refreshDependencies`
 
 ## OK now what?
 
-Continue reading here, [How-to-use-the-osmdroid-library](https://github.com/osmdroid/osmdroid/wiki/How-to-use-the-osmdroid-library)
+Continue reading here, [How-to-use-the-osmdroid-library](https://github.com/osmdroid/osmdroid/wiki)
 
 Related and **important** wiki articles
  * [Change Log](https://github.com/osmdroid/osmdroid/wiki/Changelog)
@@ -107,7 +113,9 @@ If think you have a legitimate bug to report then go to the [Issues](https://git
 
 ## I want to contribute
 
-See our [contributing guide](https://github.com/osmdroid/osmdroid/blob/master/CONTRIBUTING.md)
+See our [contributing guide](https://github.com/osmdroid/osmdroid/blob/master/CONTRIBUTING.md) 
+
+For your reference, the [dashboard](https://sourcespy.com/github/osmdroidosmdroid/) provides a high level overview of the repository including structure of [UI classes](https://sourcespy.com/github/osmdroidosmdroid/xx-ouiswing-.html), [module dependencies](https://sourcespy.com/github/osmdroidosmdroid/xx-omodulesc-.html), [external libraries](https://sourcespy.com/github/osmdroidosmdroid/xx-ojavalibs-.html), and other components of the system.
 
 ## I want more!
 
@@ -129,11 +137,32 @@ The [OSMBonusPack project](https://github.com/MKergall/osmbonuspack) adds additi
 
 [IIS Tracker](https://youtu.be/Jw8z1ke9Idk)
 
-## Building from source and using the aar in your app
-Thanks to <a href="https://github.com/gradle-fury/gradle-fury">Gradle Fury</a>, this publishes the artifacts to mavenLocal.
+## Building from source for editing osmdroid 
+
+JDK11+ is required
+Gradle 7.4.2 is what we are currently using
+Android Studio Bumblebee
+(latest supported configuration as of May 2022)
 
 ```
-./gradlew clean install
+./gradlew clean build
+```
+
+Then you can install and test the app using normal command line utils.
+
+Or just open Android studio.
+
+## Building from source and using the aar's in your app
+
+JDK11+ is required
+Gradle 7.4.2 is what we are currently using
+(latest supported configuration as of May 2022)
+
+We recommend building from the command line.
+
+
+```
+./gradlew clean build publishToMavenLocal
 ```
 
 In **your** root `build.gradle` file, add mavenLocal() if not present.
@@ -150,6 +179,18 @@ allprojects {
 Then in your APK or AAR project that needs osmdroid.
 
 ```
-    compile 'org.osmdroid:osmdroid-android:<VERSION>-SNAPSHOT:debug@aar'
+    implementation 'org.osmdroid:osmdroid-android:<VERSION>-SNAPSHOT:debug@aar'
 ```
-Where VERSION is the version listed as the value for `pom.version` in `gradle.properties`. Note that when using the release versions from Maven Central, drop the `:debug@aar` part. When using a "release" version that you build locally with gradle, you'll need `:debug@aar` instead.
+Where VERSION is the version listed as the value for `pom.version` in osmdroid's `gradle.properties`. Note that when using the release versions from Maven Central, drop the `:debug@aar` part. When using a "release" version that you build locally with gradle, you'll need `:debug@aar` instead.
+
+
+# Support
+
+osmdroid is entirely community supported. There is no corporate sponsorship. No full time employees, no paid employees.
+It's all volunteer support, if that. If you see a problem, feel free to report, fix it and open a pull request. 
+You have access to 100% of the source code. Maps are **hard** to get right and this library isn't perfect.
+
+Please don't complain about slow response times or lack of support. You will be banned. No warnings, no second chances.
+
+We do NOT provide map data, map tiles, imagery, etc. That is all provided by a map tile ~~source~~ that you select or that you provide.
+Please don't complain about a map source showing you the wrong data. It's not the fault of this library. 

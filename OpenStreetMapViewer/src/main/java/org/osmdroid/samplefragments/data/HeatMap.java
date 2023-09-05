@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * EXPERIMENTAL!!
  *
  * <a href="https://github.com/osmdroid/osmdroid/issues/499">https://github.com/osmdroid/osmdroid/issues/499</a>
@@ -123,12 +122,11 @@ public class HeatMap extends BaseSampleFragment implements MapListener, Runnable
      */
     private void generateMap() {
 
-        if (getActivity()==null)  //java.lang.IllegalStateException: Fragment HeatMap{44f341d0} not attached to Activity
+        if (getActivity() == null)  //java.lang.IllegalStateException: Fragment HeatMap{44f341d0} not attached to Activity
             return;
         if (renderJobActive)
             return;
         renderJobActive = true;
-
 
 
         int densityDpi = (int) (dm.density * cellSizeInDp);
@@ -200,9 +198,9 @@ public class HeatMap extends BaseSampleFragment implements MapListener, Runnable
             }
         }
         Log.i(TAG, "render done , done " + (System.currentTimeMillis() - now));
-        if (getActivity()==null)    //java.lang.IllegalStateException: Fragment HeatMap{44f341d0} not attached to Activity
+        if (getActivity() == null)    //java.lang.IllegalStateException: Fragment HeatMap{44f341d0} not attached to Activity
             return;
-        if (mMapView==null)  //java.lang.IllegalStateException: Fragment HeatMap{44f341d0} not attached to Activity
+        if (mMapView == null)  //java.lang.IllegalStateException: Fragment HeatMap{44f341d0} not attached to Activity
             return;
         mMapView.post(new Runnable() {
             @Override
@@ -230,7 +228,7 @@ public class HeatMap extends BaseSampleFragment implements MapListener, Runnable
 
         for (int i = 0; i < 10000; i++) {
             pts.add(new GeoPoint((Math.random() * view.getLatitudeSpan()) + view.getLatSouth(),
-                (Math.random() * view.getLongitudeSpan()) + view.getLonWest()));
+                    (Math.random() * view.getLongitudeSpan()) + view.getLonWest()));
         }
         pts.add(new GeoPoint(0d, 0d));
         pts.add(new GeoPoint(0d, 0d));
@@ -289,19 +287,19 @@ public class HeatMap extends BaseSampleFragment implements MapListener, Runnable
     private Overlay createPolygon(BoundingBox key, Integer value, int redthreshold, int orangethreshold) {
         Polygon polygon = new Polygon(mMapView);
         if (value < orangethreshold)
-            polygon.setFillColor(Color.parseColor(alpha + yellow));
+            polygon.getFillPaint().setColor(Color.parseColor(alpha + yellow));
         else if (value < redthreshold)
-            polygon.setFillColor(Color.parseColor(alpha + orange));
+            polygon.getFillPaint().setColor(Color.parseColor(alpha + orange));
         else if (value >= redthreshold)
-            polygon.setFillColor(Color.parseColor(alpha + red));
+            polygon.getFillPaint().setColor(Color.parseColor(alpha + red));
         else {
             //no polygon
         }
-        polygon.setStrokeColor(polygon.getFillColor());
+        polygon.getOutlinePaint().setColor(polygon.getFillPaint().getColor());
 
         //if you set this to something like 20f and have a low alpha setting,
         // you'll end with a gaussian blur like effect
-        polygon.setStrokeWidth(0f);
+        polygon.getOutlinePaint().setStrokeWidth(0f);
         List<GeoPoint> pts = new ArrayList<GeoPoint>();
         pts.add(new GeoPoint(key.getLatNorth(), key.getLonWest()));
         pts.add(new GeoPoint(key.getLatNorth(), key.getLonEast()));

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name" translatable="false">Open Map</string>
 
     <string name="unknown">Unknown</string>
     <string name="map_mode">Map Source</string>
@@ -28,4 +27,21 @@
 
     <string name="compass">Compass</string>
 
+    <string name="format_distance_only_meter">m</string>
+    <string name="format_distance_only_kilometer">km</string>
+    <string name="format_distance_only_mile">mi</string>
+    <string name="format_distance_only_nautical_mile">nm</string>
+    <string name="format_distance_only_foot">ft</string>
+
+    <string name="format_distance_value_unit">%1$s %2$s</string>
+    <string name="cacheManagerFailed">"Loading completed with %s errors.</string>
+    <string name="cacheManagerCleaningTitle">"Cleaning tiles</string>
+    <string name="cacheManagerCleanFailed">Cleaning failed. %s tiles deleted.</string>
+    <string name="cacheManagerDownloadingTitle">Downloading tiles</string>
+    <string name="cacheManagerUnsupportedSource">This online tile source doesn\'t support bulk download</string>
+    <string name="cacheManagerCancelTitle">Cancel map download</string>
+    <string name="cacheManagerCancelBody">Do you want to cancel the map download?</string>
+    <string name="cacheManagerYes">Yes</string>
+    <string name="cacheManagerNo">No</string>
+    <string name="cacheManagerHandlingMessage">Handling zoom level: %1$s (from %2$s to %3$s)</string>
 </resources>

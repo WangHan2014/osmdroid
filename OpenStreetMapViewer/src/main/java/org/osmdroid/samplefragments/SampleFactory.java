@@ -26,19 +26,19 @@ import org.osmdroid.samplefragments.data.HeatMap;
 import org.osmdroid.samplefragments.data.SampleGridlines;
 import org.osmdroid.samplefragments.data.SampleIISTracker;
 import org.osmdroid.samplefragments.data.SampleIISTrackerMotionTrails;
+import org.osmdroid.samplefragments.data.SampleItemizedOverlayMultiClick;
 import org.osmdroid.samplefragments.data.SampleMapSnapshot;
 import org.osmdroid.samplefragments.data.SampleMarker;
-import org.osmdroid.samplefragments.data.SampleItemizedOverlayMultiClick;
 import org.osmdroid.samplefragments.data.SampleMarkerMultiClick;
+import org.osmdroid.samplefragments.data.SampleMilestonesNonRepetitive;
 import org.osmdroid.samplefragments.data.SampleMilitaryIconsItemizedIcons;
 import org.osmdroid.samplefragments.data.SampleMilitaryIconsMarker;
 import org.osmdroid.samplefragments.data.SampleOsmPath;
 import org.osmdroid.samplefragments.data.SampleRace;
+import org.osmdroid.samplefragments.data.SampleShapeFile;
 import org.osmdroid.samplefragments.data.SampleSimpleFastPointOverlay;
 import org.osmdroid.samplefragments.data.SampleSimpleLocation;
-import org.osmdroid.samplefragments.events.SampleAnimateToWithOrientation;
-import org.osmdroid.samplefragments.events.SampleSnappable;
-import org.osmdroid.samplefragments.tileproviders.SampleTileStates;
+import org.osmdroid.samplefragments.data.SampleSpeechBalloon;
 import org.osmdroid.samplefragments.data.SampleWithMinimapItemizedOverlayWithFocus;
 import org.osmdroid.samplefragments.data.SampleWithMinimapItemizedOverlayWithScale;
 import org.osmdroid.samplefragments.data.WeatherGroundOverlaySample;
@@ -52,15 +52,20 @@ import org.osmdroid.samplefragments.drawing.DrawPolylineWithArrows;
 import org.osmdroid.samplefragments.drawing.PressToPlot;
 import org.osmdroid.samplefragments.drawing.PressToPlotWithoutWrapping;
 import org.osmdroid.samplefragments.drawing.SampleDrawPolyline;
+import org.osmdroid.samplefragments.drawing.SampleDrawPolylineAsPath;
 import org.osmdroid.samplefragments.drawing.SampleDrawPolylineWithoutVerticalWrapping;
 import org.osmdroid.samplefragments.drawing.SampleDrawPolylineWithoutWrapping;
+import org.osmdroid.samplefragments.drawing.ShowAdvancedPolylineStyles;
+import org.osmdroid.samplefragments.drawing.ShowAdvancedPolylineStylesInvalidation;
 import org.osmdroid.samplefragments.events.MarkerDrag;
 import org.osmdroid.samplefragments.events.SampleAnimateTo;
-import org.osmdroid.samplefragments.data.SampleMilestonesNonRepetitive;
+import org.osmdroid.samplefragments.events.SampleAnimateToWithOrientation;
 import org.osmdroid.samplefragments.events.SampleAnimatedZoomToLocation;
 import org.osmdroid.samplefragments.events.SampleLimitedScrollArea;
 import org.osmdroid.samplefragments.events.SampleMapBootListener;
+import org.osmdroid.samplefragments.events.SampleMapCenterOffset;
 import org.osmdroid.samplefragments.events.SampleMapEventListener;
+import org.osmdroid.samplefragments.events.SampleSnappable;
 import org.osmdroid.samplefragments.events.SampleZoomRounding;
 import org.osmdroid.samplefragments.events.SampleZoomToBounding;
 import org.osmdroid.samplefragments.events.ZoomToBoundsOnStartup;
@@ -90,17 +95,14 @@ import org.osmdroid.samplefragments.tileproviders.SampleAssetsOnly;
 import org.osmdroid.samplefragments.tileproviders.SampleAssetsOnlyRepetitionModes;
 import org.osmdroid.samplefragments.tileproviders.SampleOfflineGemfOnly;
 import org.osmdroid.samplefragments.tileproviders.SampleOfflineOnly;
+import org.osmdroid.samplefragments.tileproviders.SampleTileStates;
+import org.osmdroid.samplefragments.tileproviders.SampleUnreachableOnlineTiles;
 import org.osmdroid.samplefragments.tileproviders.SampleVeryHighZoomLevel;
-import org.osmdroid.samplefragments.tilesources.SampleBingHybrid;
-import org.osmdroid.samplefragments.tilesources.SampleBingRoad;
 import org.osmdroid.samplefragments.tilesources.SampleCopyrightOverlay;
 import org.osmdroid.samplefragments.tilesources.SampleCustomLoadingImage;
 import org.osmdroid.samplefragments.tilesources.SampleCustomTileSource;
-import org.osmdroid.samplefragments.tilesources.SampleHereWeGo;
 import org.osmdroid.samplefragments.tilesources.SampleInvertedTiles_NightMode;
 import org.osmdroid.samplefragments.tilesources.SampleLieFi;
-import org.osmdroid.samplefragments.tilesources.SampleMapBox;
-import org.osmdroid.samplefragments.tilesources.SampleMapQuest;
 import org.osmdroid.samplefragments.tilesources.SampleOfflineFirst;
 import org.osmdroid.samplefragments.tilesources.SampleOfflineSecond;
 import org.osmdroid.samplefragments.tilesources.SampleOpenSeaMap;
@@ -154,7 +156,7 @@ public final class SampleFactory implements ISampleFactory {
         //9
         mSamples.add(SampleMilitaryIconsMarker.class);
         //10
-        mSamples.add(SampleMapBox.class);
+        //mSamples.add(SampleMapBox.class);
         //11
         mSamples.add(SampleJumboCache.class);
         //12
@@ -190,9 +192,9 @@ public final class SampleFactory implements ISampleFactory {
         //27
         mSamples.add(SampleFollowMe.class);
         //28
-        mSamples.add(SampleMapQuest.class);
+        //mSamples.add(SampleMapQuest.class);
         //29
-        mSamples.add(SampleHereWeGo.class);
+        //mSamples.add(SampleHereWeGo.class);
         //30
         mSamples.add(SampleCustomLoadingImage.class);
         //31
@@ -231,14 +233,15 @@ public final class SampleFactory implements ISampleFactory {
         mSamples.add(SampleMyLocationWithClick.class);
         //48
         mSamples.add(SampleDrawPolyline.class);
+        mSamples.add(SampleDrawPolylineAsPath.class);
         //49
         mSamples.add(RecyclerCardView.class);
         //50
         mSamples.add(ScaleBarOnBottom.class);
         //51
-        mSamples.add(SampleBingHybrid.class);
+        //mSamples.add(SampleBingHybrid.class);
         //52
-        mSamples.add(SampleBingRoad.class);
+        //mSamples.add(SampleBingRoad.class);
         //53
         mSamples.add(Gridlines2.class);
         //54
@@ -281,6 +284,8 @@ public final class SampleFactory implements ISampleFactory {
         mSamples.add(DrawPolygonWithoutVerticalWrapping.class);
         mSamples.add(SampleDrawPolylineWithoutVerticalWrapping.class);
         mSamples.add(DrawPolylineWithArrows.class);
+        mSamples.add(ShowAdvancedPolylineStyles.class);
+        mSamples.add(ShowAdvancedPolylineStylesInvalidation.class);
         mSamples.add(DrawPolygonWithArrows.class);
 
         mSamples.add(StreetAddressFragment.class);  //map in a list view
@@ -292,6 +297,7 @@ public final class SampleFactory implements ISampleFactory {
         if (Build.VERSION.SDK_INT >= 15)
             mSamples.add(Plotter.class);
         mSamples.add(WeatherGroundOverlaySample.class);
+        mSamples.add(SampleShapeFile.class);
         mSamples.add(CompassPointerSample.class);
         mSamples.add(CompassRoseSample.class);
         mSamples.add(SampleZoomRounding.class);
@@ -306,7 +312,10 @@ public final class SampleFactory implements ISampleFactory {
         mSamples.add(SampleTileStates.class);
         mSamples.add(SampleAnimateToWithOrientation.class);
         mSamples.add(SampleMapSnapshot.class);
+        mSamples.add(SampleSpeechBalloon.class);
+        mSamples.add(SampleMapCenterOffset.class);
         mSamples.add(SampleSnappable.class);
+        mSamples.add(SampleUnreachableOnlineTiles.class);
     }
 
     public void addSample(Class<? extends BaseSampleFragment> clz) {

@@ -1,19 +1,12 @@
 package org.osmdroid.views.overlay;
 
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.view.MotionEvent;
 
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.util.PointL;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.Projection;
-import org.osmdroid.views.overlay.infowindow.InfoWindow;
-import org.osmdroid.views.overlay.milestones.MilestoneManager;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A polyline is a list of points, where line segments are drawn between consecutive points.
@@ -26,16 +19,9 @@ import java.util.List;
  * @author M.Kergall
  * @see <a href="http://developer.android.com/reference/com/google/android/gms/maps/model/Polyline.html">Google Maps Polyline</a>
  */
-public class Polyline extends OverlayWithIW {
+public class Polyline extends PolyOverlayWithIW {
 
-    private final Paint mPaint = new Paint();
-    private final LineDrawer mLineDrawer = new LineDrawer(256);
-    private LinearRing mOutline = new LinearRing(mLineDrawer);
-    private List<MilestoneManager> mMilestoneManagers = new ArrayList<>();
     protected OnClickListener mOnClickListener;
-    private GeoPoint mInfoWindowLocation;
-    private float mDensity = 1.0f;
-    private ArrayList<GeoPoint> mOriginalPoints = new ArrayList<>();
 
     /**
      * If MapView is not provided, infowindow popup will not function unless you set it yourself.
@@ -48,70 +34,79 @@ public class Polyline extends OverlayWithIW {
      * If MapView is null, infowindow popup will not function unless you set it yourself.
      */
     public Polyline(MapView mapView) {
-        if (mapView != null) {
-            setInfoWindow(mapView.getRepository().getDefaultPolylineInfoWindow());
-            mDensity = mapView.getContext().getResources().getDisplayMetrics().density;
-        }
+        this(mapView, false);
+    }
+
+    /**
+     * @since 6.2.0
+     */
+    public Polyline(final MapView pMapView, final boolean pUsePath, final boolean pClosePath) {
+        super(pMapView, pUsePath, pClosePath);
         //default as defined in Google API:
-        this.mPaint.setColor(Color.BLACK);
-        this.mPaint.setStrokeWidth(10.0f);
-        this.mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setAntiAlias(true);
-        mOutline.clearPath();
-        mLineDrawer.setPaint(mPaint);
+        mOutlinePaint.setColor(Color.BLACK);
+        mOutlinePaint.setStrokeWidth(10.0f);
+        mOutlinePaint.setStyle(Paint.Style.STROKE);
+        mOutlinePaint.setAntiAlias(true);
     }
 
     /**
-     * @return a copy of the points.
+     * @param pUsePath true if you want the drawing to use Path instead of Canvas.drawLines
+     *                 Not recommended in all cases, given the performances.
+     *                 Useful though if you want clean alpha vertices
+     *                 cf. https://github.com/osmdroid/osmdroid/issues/1280
+     * @since 6.1.0
      */
+    public Polyline(final MapView pMapView, final boolean pUsePath) {
+        this(pMapView, pUsePath, false);
+    }
+
+    /**
+     * @return a copy of the actual points
+     * @deprecated Use {@link #getActualPoints()} instead; copy the list if necessary
+     */
+    @Deprecated
     public ArrayList<GeoPoint> getPoints() {
-        ArrayList<GeoPoint> result = new ArrayList(mOriginalPoints.size());
-        for (GeoPoint p:mOriginalPoints)
-            result.add(p);
-        return result;
+        return new ArrayList<>(getActualPoints());
     }
 
+    /**
+     * @deprecated Use {{@link #getOutlinePaint()}} instead
+     */
+    @Deprecated
     public int getColor() {
-        return mPaint.getColor();
+        return mOutlinePaint.getColor();
     }
 
+    /**
+     * @deprecated Use {{@link #getOutlinePaint()}} instead
+     */
+    @Deprecated
     public float getWidth() {
-        return mPaint.getStrokeWidth();
+        return mOutlinePaint.getStrokeWidth();
     }
 
     /**
-     * @return the Paint used. This allows to set advanced Paint settings.
+     * @deprecated Use {{@link #getOutlinePaint()}} instead
      */
+    @Deprecated
     public Paint getPaint() {
-        return mPaint;
-    }
-
-    public boolean isVisible() {
-        return isEnabled();
+        return getOutlinePaint();
     }
 
     /**
-     * Sets whether to draw each segment of the line as a geodesic or not.
-     * Warning: it takes effect only if set before setting the points in the Polyline.
+     * @deprecated Use {{@link #getOutlinePaint()}} instead
      */
-    public void setGeodesic(boolean geodesic) {
-        mOutline.setGeodesic(geodesic);
-    }
-
-    public boolean isGeodesic() {
-        return mOutline.isGeodesic();
-    }
-
+    @Deprecated
     public void setColor(int color) {
-        mPaint.setColor(color);
+        mOutlinePaint.setColor(color);
     }
 
+    /**
+     * @deprecated Use {{@link #getOutlinePaint()}} instead
+     */
+    @Deprecated
     public void setWidth(float width) {
-        mPaint.setStrokeWidth(width);
-    }
-
-    public void setVisible(boolean visible) {
-        setEnabled(visible);
+        mOutlinePaint.setStrokeWidth(width);
     }
 
     public void setOnClickListener(OnClickListener listener) {
@@ -119,148 +114,10 @@ public class Polyline extends OverlayWithIW {
     }
 
     /**
-     * Set the points.
-     * Note that a later change in the original points List will have no effect.
-     * To remove/change points, you must call setPoints again.
-     * If geodesic mode has been set, the long segments will follow the earth "great circle".
-     */
-    public void setPoints(List<GeoPoint> points) {
-        mOutline.clearPath();
-        mOriginalPoints = new ArrayList<>(points.size());
-        for (GeoPoint p:points) {
-            mOriginalPoints.add(p);
-        }
-        mOutline.setPoints(points);
-        setDefaultInfoWindowLocation();
-    }
-
-    /**
-     * Add the point at the end.
-     * If geodesic mode has been set, the long segments will follow the earth "great circle".
-     */
-    public void addPoint(GeoPoint p){
-        mOriginalPoints.add(p);
-        mOutline.addPoint(p);
-    }
-
-    @Override
-    public void draw(final Canvas canvas, final Projection pj) {
-
-        mLineDrawer.setCanvas(canvas);
-        mOutline.setClipArea(pj);
-        mOutline.buildLinePortion(pj, mMilestoneManagers.size() > 0);
-        for (final MilestoneManager milestoneManager : mMilestoneManagers) {
-            milestoneManager.init();
-            milestoneManager.setDistances(mOutline.getDistances());
-            for (final PointL point : mOutline.getPointsForMilestones()) {
-                milestoneManager.add(point.x, point.y);
-            }
-            milestoneManager.end();
-        }
-
-        for (final MilestoneManager milestoneManager : mMilestoneManagers) {
-            milestoneManager.draw(canvas);
-        }
-        if (isInfoWindowOpen() && mInfoWindow!=null && mInfoWindow.getRelatedObject()==this) {
-            mInfoWindow.draw();
-        }
-    }
-
-    /**
-     * Detection is done is screen coordinates.
-     *
-     * @param point
-     * @param tolerance in pixels
-     * @return true if the Polyline is close enough to the point.
-     */
-    public boolean isCloseTo(GeoPoint point, double tolerance, MapView mapView) {
-        return getCloseTo(point, tolerance, mapView) != null;
-    }
-
-    /**
-     * @since 6.0.3
-     * Detection is done is screen coordinates.
-     *
-     * @param point
-     * @param tolerance in pixels
-     * @return the first GeoPoint of the Polyline close enough to the point
-     */
-    public GeoPoint getCloseTo(GeoPoint point, double tolerance, MapView mapView) {
-        return mOutline.getCloseTo(point, tolerance, mapView.getProjection(), false);
-    }
-
-    /**
-     * Set the InfoWindow to be used.
-     * Default is a BasicInfoWindow, with the layout named "bonuspack_bubble".
-     * You can use this method either to use your own layout, or to use your own sub-class of InfoWindow.
-     * If you don't want any InfoWindow to open, you can set it to null.
-     */
-    public void setInfoWindow(InfoWindow infoWindow) {
-        if (mInfoWindow != null){
-            if (mInfoWindow.getRelatedObject()==this)
-                mInfoWindow.setRelatedObject(null);
-        }
-        mInfoWindow = infoWindow;
-    }
-
-    /**
-     * Show the infowindow, if any. It will be opened either at the latest location, if any,
-     * or to a default location computed by setDefaultInfoWindowLocation method.
-     * Note that you can manually set this location with: setInfoWindowLocation
-     */
-    public void showInfoWindow() {
-        if (mInfoWindow != null && mInfoWindowLocation != null)
-            mInfoWindow.open(this, mInfoWindowLocation, 0, 0);
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(final MotionEvent event, final MapView mapView) {
-        final Projection pj = mapView.getProjection();
-        GeoPoint eventPos = (GeoPoint) pj.fromPixels((int) event.getX(), (int) event.getY());
-        double tolerance = mPaint.getStrokeWidth() * mDensity;
-        final GeoPoint closest = getCloseTo(eventPos, tolerance, mapView);
-        if (closest != null) {
-            if (mOnClickListener == null) {
-                return onClickDefault(this, mapView, closest);
-            } else {
-                return mOnClickListener.onClick(this, mapView, closest);
-            }
-        } else
-            return false;
-    }
-
-    /**
-     * @return the geopoint location where the infowindow should point at.
-     * Doesn't matter if the infowindow is currently opened or not.
-     * @since 6.0.0
-     */
-    public GeoPoint getInfoWindowLocation() {
-        return mInfoWindowLocation;
-    }
-
-    /** Internal method used to ensure that the infowindow will have a default position in all cases,
+     * Internal method used to ensure that the infowindow will have a default position in all cases,
      * so that the user can call showInfoWindow even if no tap occured before.
      * Currently, set the position on the "middle" point of the polyline.
      */
-    protected void setDefaultInfoWindowLocation(){
-        int s = mOriginalPoints.size();
-        if (s > 0)
-            mInfoWindowLocation = mOriginalPoints.get(s/2);
-        else
-            mInfoWindowLocation = new GeoPoint(0.0, 0.0);
-    }
-
-    /**
-     * Sets the infowindow anchor point to a geopoint location
-     * @since 6.0.0
-     * @param location
-     */
-    public void setInfoWindowLocation(GeoPoint location) {
-        mInfoWindowLocation = location;
-    }
-
-    //-- Polyline events listener interfaces ------------------------------------
-
     public interface OnClickListener {
         abstract boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos);
     }
@@ -276,31 +133,26 @@ public class Polyline extends OverlayWithIW {
 
     @Override
     public void onDetach(MapView mapView) {
-        mOutline = null;
+        super.onDetach(mapView);
         mOnClickListener = null;
-        mMilestoneManagers.clear();
-        mOriginalPoints = null;
-        onDestroy();
     }
 
     /**
-     * @since 6.0.0
-     */
-    public void setMilestoneManagers(final List<MilestoneManager> pMilestoneManagers) {
-        if (pMilestoneManagers == null) {
-            if (mMilestoneManagers.size() > 0) {
-                mMilestoneManagers.clear();
-            }
-        } else {
-            mMilestoneManagers = pMilestoneManagers;
-        }
-    }
-
-    /**
-     * @since 6.0.3
      * @return aggregate distance (in meters)
+     * @since 6.0.3
      */
     public double getDistance() {
         return mOutline.getDistance();
+    }
+
+    /**
+     * @since 6.2.0
+     */
+    @Override
+    protected boolean click(final MapView pMapView, final GeoPoint pEventPos) {
+        if (mOnClickListener == null) {
+            return onClickDefault(this, pMapView, pEventPos);
+        }
+        return mOnClickListener.onClick(this, pMapView, pEventPos);
     }
 }

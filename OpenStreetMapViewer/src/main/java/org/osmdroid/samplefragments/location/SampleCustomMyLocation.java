@@ -7,12 +7,13 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import org.osmdroid.samplefragments.BaseSampleFragment;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
+
+import androidx.core.app.ActivityCompat;
 
 /**
  * See https://github.com/osmdroid/osmdroid/issues/815
@@ -30,7 +31,7 @@ public class SampleCustomMyLocation extends BaseSampleFragment implements Locati
     LocationManager mgr;
     Marker myLocation;
     boolean added = false;
-    boolean followme=true;
+    boolean followme = true;
 
     @Override
     public void addOverlays() {

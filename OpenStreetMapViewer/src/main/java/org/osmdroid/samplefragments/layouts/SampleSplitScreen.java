@@ -16,7 +16,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 
-
 /**
  * Uses OSM as the upper map and MapBox (API key required) as the lower map
  * Created by alex on 6/4/16.
@@ -53,17 +52,17 @@ public class SampleSplitScreen extends BaseSampleFragment implements MapListener
         mMapView2.setTileSource(new MapBoxTileSource(getContext()));
         mMapView2.setMapListener(this);
 
-        mMapView2.setBuiltInZoomControls(true);
         mMapView2.setMultiTouchControls(true);
         mMapView2.setTilesScaledToDpi(true);
     }
 
-    long lastEvent=0;
+    long lastEvent = 0;
+
     @Override
     public boolean onScroll(ScrollEvent event) {
 
-        if(lastEvent+40 < System.currentTimeMillis()) {
-            lastEvent=System.currentTimeMillis();
+        if (lastEvent + 40 < System.currentTimeMillis()) {
+            lastEvent = System.currentTimeMillis();
             if (event.getSource() == mMapView) {
                 mMapView2.getController().setCenter(mMapView.getMapCenter());
             } else {
@@ -77,8 +76,8 @@ public class SampleSplitScreen extends BaseSampleFragment implements MapListener
 
     @Override
     public boolean onZoom(ZoomEvent event) {
-        if(lastEvent+40 < System.currentTimeMillis()) {
-            lastEvent=System.currentTimeMillis();
+        if (lastEvent + 40 < System.currentTimeMillis()) {
+            lastEvent = System.currentTimeMillis();
             if (event.getSource() == mMapView) {
                 mMapView2.getController().setZoom(event.getZoomLevel());
             } else

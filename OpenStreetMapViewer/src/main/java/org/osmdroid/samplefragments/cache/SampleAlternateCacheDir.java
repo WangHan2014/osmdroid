@@ -35,14 +35,14 @@ public class SampleAlternateCacheDir extends BaseSampleFragment {
         // an inflater call.
 
         //get the list of all mount points
-        List<StorageUtils.StorageInfo> storageList = StorageUtils.getStorageList();
+        List<StorageUtils.StorageInfo> storageList = StorageUtils.getStorageList(getActivity());
         //loop over them to find a writable location
         //or do whatever you need to do to select a new tile cache path.
 
         //then set it to the current tile cache location. must be done BEFORE creating the map
         //note this is before setContentView. The other option is it bounce the tile provider
         //via mMapView.setTileProvider();
-        
+
         //Configuration.getInstance().setOsmdroidTileCache(adrive);
 
 

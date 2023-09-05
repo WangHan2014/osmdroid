@@ -1,100 +1,89 @@
 package org.osmdroid.samples;
 
-import org.osmdroid.tileprovider.MapTileProviderBasic;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.TilesOverlay;
-
-import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
+import org.osmdroid.R;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.TilesOverlay;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 /**
- *
  * @author Alex van der Linden
- *
  */
-public class SampleWithTilesOverlay extends Activity {
+public class SampleWithTilesOverlay extends AppCompatActivity {
 
-	// ===========================================================
-	// Constants
-	// ===========================================================
+    private MapView mMapView;
 
-	// ===========================================================
-	// Fields
-	// ===========================================================
+    /**
+     * Called when the activity is first created.
+     */
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-	private MapView mMapView;
-	private TilesOverlay mTilesOverlay;
-	private MapTileProviderBasic mProvider;
-	private RelativeLayout rl;
+        // Setup base map
+        setContentView(R.layout.activity_samplewithtilesoverlay);
 
-	// ===========================================================
-	// Constructors
-	// ===========================================================
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        Toolbar toolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
 
-		// Setup base map
-		rl = new RelativeLayout(this);
+        //noinspection ConstantConditions
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-		this.mMapView = new MapView(this);
-		this.mMapView.setTilesScaledToDpi(true);
-		rl.addView(this.mMapView, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT));
-		this.mMapView.setBuiltInZoomControls(true);
+        final LinearLayout mapContainer = findViewById(R.id.map_container);
 
-		// zoom to the netherlands
-		this.mMapView.getController().setZoom(7);
-		this.mMapView.getController().setCenter(new GeoPoint(51500000, 5400000));
+        mMapView = new MapView(this);
+        mMapView.setTilesScaledToDpi(true);
+        mapContainer.addView(this.mMapView, new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT));
+        mMapView.getZoomController().setVisibility(
+                CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
 
-		// Add tiles layer
-		mProvider = new MapTileProviderBasic(getApplicationContext());
-		mProvider.setTileSource(TileSourceFactory.FIETS_OVERLAY_NL);
-		this.mTilesOverlay = new TilesOverlay(mProvider, this.getBaseContext());
-		this.mMapView.getOverlays().add(this.mTilesOverlay);
+        //Copyright overlay
+        String copyrightNotice = mMapView.getTileProvider().getTileSource().getCopyrightNotice();
+        CopyrightOverlay copyrightOverlay = new CopyrightOverlay(this);
+        copyrightOverlay.setCopyrightNotice(copyrightNotice);
+        mMapView.getOverlays().add(copyrightOverlay);
 
-		this.setContentView(rl);
-	}
+        // zoom to the netherlands
+        mMapView.getController().setZoom(8.);
+        mMapView.getController().setCenter(new GeoPoint(53.6, 5.3));
 
+        // Add tiles layer
+        MapTileProviderBasic provider = new MapTileProviderBasic(getApplicationContext());
+        provider.setTileSource(TileSourceFactory.PUBLIC_TRANSPORT);
+        TilesOverlay tilesOverlay = new TilesOverlay(provider, this.getBaseContext());
+        tilesOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+        mMapView.getOverlays().add(tilesOverlay);
+    }
 
-	@Override
-	public void onDestroy(){
-		super.onDestroy();
-		if (mMapView !=null)
-			mMapView.onDetach();
-		mMapView =null;
-		if (mProvider!=null)
-			mProvider.detach();
-		mProvider = null;
-	}
-	// ===========================================================
-	// Getter & Setter
-	// ===========================================================
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 
-	// ===========================================================
-	// Methods from SuperClass/Interfaces
-	// ===========================================================
+    @Override
+    public void onPause() {
+        super.onPause();
+        mMapView.onPause();
+    }
 
-	// ===========================================================
-	// Methods
-	// ===========================================================
-	@Override
-	public void onPause(){
-		super.onPause();
-		mMapView.onPause();
-	}
-
-	@Override
-	public void onResume(){
-		super.onResume();
-		mMapView.onResume();
-	}
-	// ===========================================================
-	// Inner and Anonymous Classes
-	// ===========================================================
+    @Override
+    public void onResume() {
+        super.onResume();
+        mMapView.onResume();
+    }
 }

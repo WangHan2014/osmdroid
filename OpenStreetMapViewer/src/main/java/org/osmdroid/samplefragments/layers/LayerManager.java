@@ -1,7 +1,6 @@
 package org.osmdroid.samplefragments.layers;
 
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +29,8 @@ import org.osmdroid.views.overlay.Polyline;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+
 /**
  * Views the current layers in a navigation drawer layout
  * created on 2/18/2018.
@@ -41,6 +42,7 @@ public class LayerManager extends BaseSampleFragment {
     private String[] mPlanetTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+
     @Override
     public String getSampleTitle() {
         return "Layer Manager";
@@ -52,16 +54,16 @@ public class LayerManager extends BaseSampleFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.layermanage_drawer, container,false);
+        View root = inflater.inflate(R.layout.layermanage_drawer, container, false);
 
         mMapView = root.findViewById(R.id.mapview);
         textViewCurrentLocation = root.findViewById(R.id.textViewCurrentLocation);
 
 
-        mPlanetTitles = new String[] {"Layer 1", "Layer 2"};
+        mPlanetTitles = new String[]{"Layer 1", "Layer 2"};
         mDrawerLayout = root.findViewById(R.id.drawer_layout);
         mDrawerList = root.findViewById(R.id.left_drawer);
-        final OverlayAdapter adapter = new OverlayAdapter(getContext(),mMapView.getOverlayManager());
+        final OverlayAdapter adapter = new OverlayAdapter(getContext(), mMapView.getOverlayManager());
         // Set the adapter for the list view
         mDrawerList.setAdapter(adapter);
         // Set the list's click listener
@@ -70,15 +72,15 @@ public class LayerManager extends BaseSampleFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Overlay overlay = adapter.getItem(position);
-                if (overlay instanceof Marker){
+                if (overlay instanceof Marker) {
                     ((Marker) overlay).showInfoWindow();
                     mMapView.getController().animateTo(((Marker) overlay).getPosition());
 
-                } else if (overlay instanceof Polygon){
+                } else if (overlay instanceof Polygon) {
                     ((Polygon) overlay).showInfoWindow();
                     mMapView.getController().animateTo(((Polygon) overlay).getInfoWindowLocation());
 
-                } else if (overlay instanceof Polyline){
+                } else if (overlay instanceof Polyline) {
                     ((Polyline) overlay).showInfoWindow();
                     mMapView.getController().animateTo(((Polyline) overlay).getInfoWindowLocation());
 
@@ -112,7 +114,7 @@ public class LayerManager extends BaseSampleFragment {
         mMapView.addMapListener(new MapListener() {
             @Override
             public boolean onScroll(ScrollEvent event) {
-                Log.i(IMapView.LOGTAG, System.currentTimeMillis() + " onScroll " + event.getX() + "," +event.getY() );
+                Log.i(IMapView.LOGTAG, System.currentTimeMillis() + " onScroll " + event.getX() + "," + event.getY());
                 //Toast.makeText(getActivity(), "onScroll", Toast.LENGTH_SHORT).show();
                 updateInfo();
                 return true;
@@ -156,7 +158,6 @@ public class LayerManager extends BaseSampleFragment {
         mMapView.getOverlays().add(startMarker);
 
 
-
         startPoint = new GeoPoint(38.8895, -77.0353);
         startMarker = new Marker(mMapView);
         startMarker.setPosition(startPoint);
@@ -181,9 +182,9 @@ public class LayerManager extends BaseSampleFragment {
         Polyline mEastPolyline = new Polyline();
 
 
-         ArrayList<GeoPoint> list = new ArrayList<>();
-        BoundingBox  sCentralParkBoundingBox = new BoundingBox(40.796788,
-            -73.949232, 40.768094, -73.981762);
+        ArrayList<GeoPoint> list = new ArrayList<>();
+        BoundingBox sCentralParkBoundingBox = new BoundingBox(40.796788,
+                -73.949232, 40.768094, -73.981762);
         list.add(new GeoPoint(sCentralParkBoundingBox.getActualNorth(), -85));
         list.add(new GeoPoint(sCentralParkBoundingBox.getActualNorth(), -65));
         mNorthPolyline.setPoints(list);
@@ -211,11 +212,11 @@ public class LayerManager extends BaseSampleFragment {
         Toast.makeText(this.mMapView.getContext(), "Swipe from the right", Toast.LENGTH_LONG).show();
     }
 
-    private void updateInfo(){
+    private void updateInfo() {
         IGeoPoint mapCenter = mMapView.getMapCenter();
-        textViewCurrentLocation.setText(df.format(mapCenter.getLatitude())+","+
-            df.format(mapCenter.getLongitude())
-            +",zoom="+mMapView.getZoomLevelDouble());
+        textViewCurrentLocation.setText(df.format(mapCenter.getLatitude()) + "," +
+                df.format(mapCenter.getLongitude())
+                + ",zoom=" + mMapView.getZoomLevelDouble());
 
     }
 }

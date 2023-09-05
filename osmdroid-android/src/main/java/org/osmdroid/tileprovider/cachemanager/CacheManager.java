@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import org.osmdroid.api.IMapView;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.library.R;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.modules.CantContinueException;
@@ -82,12 +83,13 @@ public class CacheManager {
 
     /**
      * See https://github.com/osmdroid/osmdroid/issues/619
+     *
      * @since 5.6.5
      */
     public CacheManager(final MapTileProviderBase pTileProvider,
                         final IFilesystemCache pWriter,
                         final int pMinZoomLevel, final int pMaxZoomLevel)
-            throws TileSourcePolicyException{
+            throws TileSourcePolicyException {
         this(pTileProvider.getTileSource(), pWriter, pMinZoomLevel, pMaxZoomLevel);
     }
 
@@ -97,7 +99,7 @@ public class CacheManager {
     public CacheManager(final ITileSource pTileSource,
                         final IFilesystemCache pWriter,
                         final int pMinZoomLevel, final int pMaxZoomLevel)
-            throws TileSourcePolicyException{
+            throws TileSourcePolicyException {
         mTileSource = pTileSource;
         mTileWriter = pWriter;
         mMinZoomLevel = pMinZoomLevel;
@@ -105,10 +107,10 @@ public class CacheManager {
     }
 
     /**
-     * @since 5.6.3
      * @return
+     * @since 5.6.3
      */
-    public int getPendingJobs(){
+    public int getPendingJobs() {
         return mPendingTasks.size();
     }
 
@@ -150,7 +152,7 @@ public class CacheManager {
             return true;
         }
         //check if the destination already has the file
-        if (mTileWriter.exists(tileSource, pMapTileIndex)){
+        if (mTileWriter.exists(tileSource, pMapTileIndex)) {
             return true;
         }
 
@@ -196,6 +198,7 @@ public class CacheManager {
 
     /**
      * Computes the theoretical tiles covered by the bounding box
+     *
      * @return list of tiles, sorted by ascending zoom level
      */
     public static List<Long> getTilesCoverage(final BoundingBox pBB,
@@ -210,9 +213,10 @@ public class CacheManager {
 
     /**
      * Computes the theoretical tiles covered by the bounding box
+     *
      * @return list of tiles for that zoom level, without any specific order
      */
-    public static Collection<Long> getTilesCoverage(final BoundingBox pBB, final int pZoomLevel){
+    public static Collection<Long> getTilesCoverage(final BoundingBox pBB, final int pZoomLevel) {
         final Set<Long> result = new LinkedHashSet<>();
         for (Long mapTile : getTilesCoverageIterable(pBB, pZoomLevel, pZoomLevel)) {
             result.add(mapTile);
@@ -222,7 +226,8 @@ public class CacheManager {
 
     /**
      * Iterable returning tiles covered by the bounding box sorted by ascending zoom level
-     * @param pBB the given bounding box
+     *
+     * @param pBB      the given bounding box
      * @param pZoomMin the given minimum zoom level
      * @param pZoomMax the given maximum zoom level
      * @return the iterable described above
@@ -239,12 +244,13 @@ public class CacheManager {
     /**
      * Retrieve upper left and lower right points(exclusive) corresponding to the tiles coverage for
      * the selected zoom level.
-     * @param pBB the given bounding box
+     *
+     * @param pBB        the given bounding box
      * @param pZoomLevel the given zoom level
      * @return the {@link Rect} reflecting the tiles coverage
      */
     public static Rect getTilesRect(final BoundingBox pBB,
-                                    final int pZoomLevel){
+                                    final int pZoomLevel) {
         final int mapTileUpperBound = 1 << pZoomLevel;
         final int right = MapView.getTileSystem().getTileXFromLongitude(pBB.getLonEast(), pZoomLevel);
         final int bottom = MapView.getTileSystem().getTileYFromLatitude(pBB.getLatSouth(), pZoomLevel);
@@ -263,6 +269,7 @@ public class CacheManager {
 
     /**
      * Computes the theoretical tiles covered by the list of points
+     *
      * @return list of tiles, sorted by ascending zoom level
      */
     public static List<Long> getTilesCoverage(final ArrayList<GeoPoint> pGeoPoints,
@@ -320,8 +327,8 @@ public class CacheManager {
                         wayPoint.setLongitude(((lonRad * 180.0 / Math.PI)));
 
                         tile = new Point(
-                            MapView.getTileSystem().getTileXFromLongitude(wayPoint.getLongitude(), pZoomLevel),
-                            MapView.getTileSystem().getTileYFromLatitude(wayPoint.getLatitude(), pZoomLevel));
+                                MapView.getTileSystem().getTileXFromLongitude(wayPoint.getLongitude(), pZoomLevel),
+                                MapView.getTileSystem().getTileYFromLatitude(wayPoint.getLatitude(), pZoomLevel));
 
                         if (!tile.equals(prevTile)) {
 //Log.d(Constants.APP_TAG, "New Tile lat " + tile.x + " lon " + tile.y);
@@ -342,8 +349,8 @@ public class CacheManager {
 
             } else {
                 tile = new Point(
-                    MapView.getTileSystem().getTileXFromLongitude(geoPoint.getLongitude(), pZoomLevel),
-                    MapView.getTileSystem().getTileYFromLatitude(geoPoint.getLatitude(), pZoomLevel));
+                        MapView.getTileSystem().getTileXFromLongitude(geoPoint.getLongitude(), pZoomLevel),
+                        MapView.getTileSystem().getTileYFromLatitude(geoPoint.getLatitude(), pZoomLevel));
                 prevTile = tile;
 
                 int ofsx = tile.x >= 0 ? 0 : -tile.x;
@@ -368,6 +375,7 @@ public class CacheManager {
     public int possibleTilesInArea(final BoundingBox pBB, final int pZoomMin, final int pZoomMax) {
         return getTilesCoverageIterable(pBB, pZoomMin, pZoomMax).size();
     }
+
     /**
      * @return the theoretical number of tiles covered by the list of points
      * Calculation done based on http://www.movable-type.co.uk/scripts/latlong.html
@@ -392,7 +400,12 @@ public class CacheManager {
      * @param zoomMax
      */
     public CacheManagerTask downloadAreaAsync(Context ctx, BoundingBox bb, final int zoomMin, final int zoomMax) {
-        final CacheManagerTask task = new CacheManagerTask(this, getDownloadingAction(), bb, zoomMin, zoomMax);
+        final CacheManagerTask task = new CacheManagerTask(
+                this,
+                getDownloadingAction(ctx),
+                bb,
+                zoomMin,
+                zoomMax);
         task.addCallback(getDownloadingDialog(ctx, task));
         return execute(task);
     }
@@ -406,10 +419,16 @@ public class CacheManager {
      * @param zoomMax
      */
     public CacheManagerTask downloadAreaAsync(Context ctx, ArrayList<GeoPoint> geoPoints, final int zoomMin, final int zoomMax) {
-        final CacheManagerTask task = new CacheManagerTask(this, getDownloadingAction(), geoPoints, zoomMin, zoomMax);
+        final CacheManagerTask task = new CacheManagerTask(
+                this,
+                getDownloadingAction(ctx),
+                geoPoints,
+                zoomMin,
+                zoomMax);
         task.addCallback(getDownloadingDialog(ctx, task));
         return execute(task);
     }
+
     /**
      * Download in background all tiles of the specified area in osmdroid cache.
      *
@@ -419,7 +438,12 @@ public class CacheManager {
      * @param zoomMax
      */
     public CacheManagerTask downloadAreaAsync(Context ctx, BoundingBox bb, final int zoomMin, final int zoomMax, final CacheManagerCallback callback) {
-        final CacheManagerTask task = new CacheManagerTask(this, getDownloadingAction(), bb, zoomMin, zoomMax);
+        final CacheManagerTask task = new CacheManagerTask(
+                this,
+                getDownloadingAction(ctx),
+                bb,
+                zoomMin,
+                zoomMax);
         task.addCallback(callback);
         task.addCallback(getDownloadingDialog(ctx, task));
         return execute(task);
@@ -434,7 +458,12 @@ public class CacheManager {
      * @param zoomMax
      */
     public CacheManagerTask downloadAreaAsync(Context ctx, ArrayList<GeoPoint> geoPoints, final int zoomMin, final int zoomMax, final CacheManagerCallback callback) {
-        final CacheManagerTask task = new CacheManagerTask(this, getDownloadingAction(), geoPoints, zoomMin, zoomMax);
+        final CacheManagerTask task = new CacheManagerTask(
+                this,
+                getDownloadingAction(ctx),
+                geoPoints,
+                zoomMin,
+                zoomMax);
         task.addCallback(callback);
         task.addCallback(getDownloadingDialog(ctx, task));
         return execute(task);
@@ -450,7 +479,12 @@ public class CacheManager {
      * @since
      */
     public CacheManagerTask downloadAreaAsyncNoUI(Context ctx, ArrayList<GeoPoint> geoPoints, final int zoomMin, final int zoomMax, final CacheManagerCallback callback) {
-        final CacheManagerTask task = new CacheManagerTask(this, getDownloadingAction(), geoPoints, zoomMin, zoomMax);
+        final CacheManagerTask task = new CacheManagerTask(
+                this,
+                getDownloadingAction(ctx),
+                geoPoints,
+                zoomMin,
+                zoomMax);
         task.addCallback(callback);
         return execute(task);
     }
@@ -465,7 +499,12 @@ public class CacheManager {
      * @since 5.3
      */
     public CacheManagerTask downloadAreaAsyncNoUI(Context ctx, BoundingBox bb, final int zoomMin, final int zoomMax, final CacheManagerCallback callback) {
-        final CacheManagerTask task = new CacheManagerTask(this, getDownloadingAction(), bb, zoomMin, zoomMax);
+        final CacheManagerTask task = new CacheManagerTask(
+                this,
+                getDownloadingAction(ctx),
+                bb,
+                zoomMin,
+                zoomMax);
         task.addCallback(callback);
         execute(task);
         return task;
@@ -473,9 +512,10 @@ public class CacheManager {
 
     /**
      * cancels all tasks
+     *
      * @since 5.6.3
      */
-    public void cancelAllJobs(){
+    public void cancelAllJobs() {
         Iterator<CacheManagerTask> iterator = mPendingTasks.iterator();
         while (iterator.hasNext()) {
             CacheManagerTask next = iterator.next();
@@ -493,21 +533,26 @@ public class CacheManager {
      * @param zoomMax
      */
     public CacheManagerTask downloadAreaAsync(Context ctx, List<Long> pTiles, final int zoomMin, final int zoomMax) {
-        final CacheManagerTask task = new CacheManagerTask(this, getDownloadingAction(), pTiles, zoomMin, zoomMax);
+        final CacheManagerTask task = new CacheManagerTask(
+                this,
+                getDownloadingAction(ctx),
+                pTiles,
+                zoomMin,
+                zoomMax);
         task.addCallback(getDownloadingDialog(ctx, task));
         return execute(task);
     }
 
     /*
-    * verifyCancel decides wether user has to confirm the cancel action via a alert
-    *
-    * @param state
-    */
-    public void setVerifyCancel(boolean state){
+     * verifyCancel decides wether user has to confirm the cancel action via a alert
+     *
+     * @param state
+     */
+    public void setVerifyCancel(boolean state) {
         verifyCancel = state;
     }
 
-    public boolean getVerifyCancel(){
+    public boolean getVerifyCancel() {
         return verifyCancel;
     }
 
@@ -545,6 +590,7 @@ public class CacheManager {
 
         /**
          * this is fired when the task has been completed but had at least one download error.
+         *
          * @param errors
          */
         public void onTaskFailed(int errors);
@@ -554,26 +600,28 @@ public class CacheManager {
 
         private final CacheManagerTask mTask;
         private final ProgressDialog mProgressDialog;
-
+        private String handleMessage;
         public CacheManagerDialog(final Context pCtx, final CacheManagerTask pTask) {
             mTask = pTask;
+            handleMessage = pCtx.getString(R.string.cacheManagerHandlingMessage);
             mProgressDialog = new ProgressDialog(pCtx);
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             mProgressDialog.setCancelable(true);
             // If verifyCancel is set to true, ask for verification before canceling
-            if(pTask.mManager.getVerifyCancel()){
+            if (pTask.mManager.getVerifyCancel()) {
                 mProgressDialog.setOnCancelListener(new OnCancelListener() {
-                    @Override public void onCancel(final DialogInterface cancelDialog) {
+                    @Override
+                    public void onCancel(final DialogInterface cancelDialog) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(pCtx);
-                        builder.setTitle("Cancel map download");
-                        builder.setMessage("Do you want to cancel the map download?");
-                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        builder.setTitle(pCtx.getString(R.string.cacheManagerCancelTitle));
+                        builder.setMessage(pCtx.getString(R.string.cacheManagerCancelBody));
+                        builder.setPositiveButton(pCtx.getString(R.string.cacheManagerYes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mTask.cancel(true);
                             }
                         });
-                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        builder.setNegativeButton(pCtx.getString(R.string.cacheManagerNo), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -583,8 +631,7 @@ public class CacheManager {
                         builder.show();
                     }
                 });
-            }
-            else{
+            } else {
                 mProgressDialog.setOnCancelListener(new OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
@@ -595,7 +642,7 @@ public class CacheManager {
         }
 
         protected String zoomMessage(int zoomLevel, int zoomMin, int zoomMax) {
-            return "Handling zoom level: " + zoomLevel + " (from " + zoomMin + " to " + zoomMax + ")";
+            return String.format(handleMessage, zoomLevel, zoomMin, zoomMax);
         }
 
         abstract protected String getUITitle();
@@ -650,8 +697,8 @@ public class CacheManager {
         private final ArrayList<CacheManagerCallback> mCallbacks = new ArrayList<>();
 
         private CacheManagerTask(final CacheManager pManager, final CacheManagerAction pAction,
-                                final IterableWithSize<Long> pTiles,
-                                final int pZoomMin, final int pZoomMax) {
+                                 final IterableWithSize<Long> pTiles,
+                                 final int pZoomMin, final int pZoomMax) {
             mManager = pManager;
             mAction = pAction;
             mTiles = pTiles;
@@ -665,13 +712,13 @@ public class CacheManager {
             this(pManager, pAction, new ListWrapper<>(pTiles), pZoomMin, pZoomMax);
         }
 
-        public CacheManagerTask(final CacheManager pManager,  final CacheManagerAction pAction,
+        public CacheManagerTask(final CacheManager pManager, final CacheManagerAction pAction,
                                 final ArrayList<GeoPoint> pGeoPoints,
                                 final int pZoomMin, final int pZoomMax) {
             this(pManager, pAction, getTilesCoverage(pGeoPoints, pZoomMin, pZoomMax), pZoomMin, pZoomMax);
         }
 
-        public CacheManagerTask(final CacheManager pManager,  final CacheManagerAction pAction,
+        public CacheManagerTask(final CacheManager pManager, final CacheManagerAction pAction,
                                 final BoundingBox pBB,
                                 final int pZoomMin, final int pZoomMax) {
             this(pManager, pAction, getTilesCoverageIterable(pBB, pZoomMin, pZoomMax), pZoomMin, pZoomMax);
@@ -684,7 +731,7 @@ public class CacheManager {
         }
 
         @Override
-        protected void onPreExecute(){
+        protected void onPreExecute() {
             final int total = mTiles.size();
             for (final CacheManagerCallback callback : mCallbacks) {
                 try {
@@ -714,7 +761,7 @@ public class CacheManager {
         }
 
         @Override
-        protected void onCancelled(){
+        protected void onCancelled() {
             mManager.mPendingTasks.remove(this);
         }
 
@@ -767,13 +814,15 @@ public class CacheManager {
         return new CacheManagerDialog(pCtx, pTask) {
             @Override
             protected String getUITitle() {
-                return "Downloading tiles";
+                return pCtx.getString(R.string.cacheManagerDownloadingTitle);
             }
 
             @Override
             public void onTaskFailed(int errors) {
                 super.onTaskFailed(errors);
-                Toast.makeText(pCtx, "Loading completed with " + errors + " errors.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(pCtx,
+                        String.format(pCtx.getString(R.string.cacheManagerFailed), errors+""),
+                        Toast.LENGTH_SHORT).show();
             }
         };
     }
@@ -782,24 +831,29 @@ public class CacheManager {
         return new CacheManagerDialog(pCtx, pTask) {
             @Override
             protected String getUITitle() {
-                return "Cleaning tiles";
+                return pCtx.getString(R.string.cacheManagerCleaningTitle);
             }
 
             @Override
             public void onTaskFailed(int deleted) {
                 super.onTaskFailed(deleted);
-                Toast.makeText(pCtx, "Cleaning completed, " + deleted + " tiles deleted.", Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(pCtx,
+                        String.format(pCtx.getString(R.string.cacheManagerCleanFailed), deleted+""),
+                        Toast.LENGTH_SHORT).show();
             }
         };
     }
 
     /**
      * Action to perform on a tile within a CacheManagerTask
+     *
      * @author F.Fontaine
      */
     public interface CacheManagerAction {
         /**
          * Preconditions to check before bulk action
+         *
          * @return true if we pass the check
          */
         boolean preCheck();
@@ -811,6 +865,7 @@ public class CacheManager {
 
         /**
          * The action to perform on a single tile
+         *
          * @return true if you want to increment the action counter
          */
         boolean tileAction(final long pMapTileIndex);
@@ -834,13 +889,13 @@ public class CacheManager {
         }
     }
 
-    public CacheManagerAction getDownloadingAction() {
+    public CacheManagerAction getDownloadingAction(Context pCtx) {
         return new CacheManagerAction() {
             @Override
             public boolean preCheck() {
                 if (mTileSource instanceof OnlineTileSourceBase) {
                     if (!((OnlineTileSourceBase) mTileSource).getTileSourcePolicy().acceptsBulkDownload()) {
-                        throw new TileSourcePolicyException("This online tile source doesn't support bulk download");
+                        throw new TileSourcePolicyException(pCtx.getString(R.string.cacheManagerUnsupportedSource));
                     }
                     return true;
                 } else {
@@ -903,9 +958,10 @@ public class CacheManager {
      * @param zoomMax
      */
     public CacheManagerTask cleanAreaAsync(final Context ctx, ArrayList<GeoPoint> geoPoints, int zoomMin, int zoomMax) {
-        BoundingBox extendedBounds = extendedBoundsFromGeoPoints(geoPoints,zoomMin);
+        BoundingBox extendedBounds = extendedBoundsFromGeoPoints(geoPoints, zoomMin);
         return cleanAreaAsync(ctx, extendedBounds, zoomMin, zoomMax);
     }
+
     /**
      * Remove all cached tiles in the specified area.
      */

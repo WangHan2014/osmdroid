@@ -1,8 +1,8 @@
 package org.osmdroid.samplefragments.layouts.pager;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 /**
  * Created by alex on 10/22/16.
@@ -15,11 +15,13 @@ public class MapSliderAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        switch (position){
+        switch (position) {
             case 0:
                 return new SimpleTextFragment();
-            case 1: return new MapFragment();
-            case 2: return new WebviewFragment();
+            case 1:
+                return new MapFragment();
+            case 2:
+                return new WebviewFragment();
         }
         return null;
     }

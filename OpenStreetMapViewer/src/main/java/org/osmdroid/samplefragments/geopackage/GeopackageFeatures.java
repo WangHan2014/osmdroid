@@ -37,13 +37,13 @@ import java.util.List;
 import java.util.Set;
 
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.GeoPackageManager;
-import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.wkb.geom.Geometry;
+import mil.nga.sf.Geometry;
 
 import static org.osmdroid.samplefragments.events.SampleMapEventListener.df;
 
@@ -125,24 +125,24 @@ public class GeopackageFeatures extends BaseSampleFragment {
         if (maps.length == 0) {
             //show a warning that no map files were found
             android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(
-                getContext());
+                    getContext());
 
             // set title
             alertDialogBuilder.setTitle("No Geopackage files found");
 
             // set dialog message
             alertDialogBuilder
-                .setMessage("In order to render map tiles, you'll need to either create or obtain .gpkg files. See http://www.geopackage.org/ for more info. Place them in "
-                    + Configuration.getInstance().getOsmdroidBasePath().getAbsolutePath())
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (alertDialog != null) {
-                            alertDialog.hide();
-                            alertDialog.dismiss();
+                    .setMessage("In order to render map tiles, you'll need to either create or obtain .gpkg files. See http://www.geopackage.org/ for more info. Place them in "
+                            + Configuration.getInstance().getOsmdroidBasePath().getAbsolutePath())
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            if (alertDialog != null) {
+                                alertDialog.hide();
+                                alertDialog.dismiss();
+                            }
                         }
-                    }
-                });
+                    });
 
 
             // create alert dialog
@@ -174,7 +174,7 @@ public class GeopackageFeatures extends BaseSampleFragment {
                 // Open database
 
 
-                for (int k=0; k < databases.size(); k++) {
+                for (int k = 0; k < databases.size(); k++) {
                     GeoPackage geoPackage = manager.open(databases.get(k));
                     // Feature tile tables
                     List<String> features = geoPackage.getFeatureTables();
@@ -186,13 +186,13 @@ public class GeopackageFeatures extends BaseSampleFragment {
                             PolylineOptions polylineRenderingOptions = new PolylineOptions();
                             polylineRenderingOptions.setWidth(2f);
                             polylineRenderingOptions.setColor(Color.argb(100, 255, 0, 0));
-                            polylineRenderingOptions.setTitle(databases.get(k) + ":"+ features.get(i));
+                            polylineRenderingOptions.setTitle(databases.get(k) + ":" + features.get(i));
 
                             PolygonOptions polygonOptions = new PolygonOptions();
                             polygonOptions.setStrokeWidth(2f);
                             polygonOptions.setFillColor(Color.argb(100, 255, 0, 255));
                             polygonOptions.setStrokeColor(Color.argb(100, 0, 0, 255));
-                            polygonOptions.setTitle(databases.get(k) + ":"+ features.get(i));
+                            polygonOptions.setTitle(databases.get(k) + ":" + features.get(i));
 
                             OsmMapShapeConverter converter = new OsmMapShapeConverter(null, markerRenderingOptions, polylineRenderingOptions, polygonOptions);
 
@@ -210,7 +210,7 @@ public class GeopackageFeatures extends BaseSampleFragment {
 
                                             //get it here: https://github.com/opengeospatial/geopackage/raw/gh-pages/data/states10.gpkg
                                             String state = (String) featureRow.getValue("STATE_NAME");
-                                            String stateabbr = (String)featureRow.getValue("STATE_ABBR");
+                                            String stateabbr = (String) featureRow.getValue("STATE_ABBR");
                                             long population = (long) featureRow.getValue("POP1996");
                                             applyTheming(state, stateabbr, population, polygonOptions);
                                         }
@@ -277,12 +277,12 @@ public class GeopackageFeatures extends BaseSampleFragment {
             case "VT":
             case "VA":
             case "WA":
-               polygonOptions.setFillColor(Color.argb(alpha, 0,0,255));
-                polygonOptions.setSubtitle(state + "<br>Population:" + population +"<br>Voted: Democratic in 2016");
+                polygonOptions.setFillColor(Color.argb(alpha, 0, 0, 255));
+                polygonOptions.setSubtitle(state + "<br>Population:" + population + "<br>Voted: Democratic in 2016");
                 break;
             default:
-                polygonOptions.setFillColor(Color.argb(alpha, 255,0,0));
-                polygonOptions.setSubtitle(state + "<br>Population:" + population +"<br>Voted: Republican in 2016");
+                polygonOptions.setFillColor(Color.argb(alpha, 255, 0, 0));
+                polygonOptions.setSubtitle(state + "<br>Population:" + population + "<br>Voted: Republican in 2016");
 
         }
     }
@@ -315,14 +315,13 @@ public class GeopackageFeatures extends BaseSampleFragment {
         StringBuilder sb = new StringBuilder();
         IGeoPoint mapCenter = mMapView.getMapCenter();
         sb.append(df.format(mapCenter.getLatitude()) + "," +
-            df.format(mapCenter.getLongitude())
-            + ",zoom=" + mMapView.getZoomLevelDouble());
+                df.format(mapCenter.getLongitude())
+                + ",zoom=" + mMapView.getZoomLevelDouble());
 
         if (currentSource != null) {
             sb.append("\n");
             sb.append(currentSource.name() + "," + currentSource.getBaseUrl());
         }
-
 
 
         textViewCurrentLocation.setText(sb.toString());
@@ -333,9 +332,9 @@ public class GeopackageFeatures extends BaseSampleFragment {
      *
      * @return
      */
-    protected static Set<File> findMapFiles() {
+    protected Set<File> findMapFiles() {
         Set<File> maps = new HashSet<>();
-        List<StorageUtils.StorageInfo> storageList = StorageUtils.getStorageList();
+        List<StorageUtils.StorageInfo> storageList = StorageUtils.getStorageList(getActivity());
         for (int i = 0; i < storageList.size(); i++) {
             File f = new File(storageList.get(i).path + File.separator + "osmdroid" + File.separator);
             if (f.exists()) {
@@ -345,14 +344,12 @@ public class GeopackageFeatures extends BaseSampleFragment {
         return maps;
     }
 
-    static private Collection<? extends File> scan(File f) {
+    private Collection<? extends File> scan(File f) {
         List<File> ret = new ArrayList<>();
         File[] files = f.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                if (pathname.getName().toLowerCase().endsWith(".gpkg"))
-                    return true;
-                return false;
+                return pathname.getName().toLowerCase().endsWith(".gpkg");
             }
         });
         if (files != null) {

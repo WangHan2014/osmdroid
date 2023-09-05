@@ -54,7 +54,7 @@ public class BingMapTileSource extends QuadTreeTileSource implements IStyledTile
     private static final String FILENAME_ENDING = ".jpeg";
 
     // URL used to get imageryData. It is requested in order to get tiles url patterns
-    private static final String BASE_URL_PATTERN = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/%s?mapVersion=v1&output=json&key=%s";
+    private static final String BASE_URL_PATTERN = "https://dev.virtualearth.net/REST/V1/Imagery/Metadata/%s?mapVersion=v1&output=json&uriScheme=https&key=%s";
 
     /**
      * Bing Map key set by user.
@@ -106,7 +106,7 @@ public class BingMapTileSource extends QuadTreeTileSource implements IStyledTile
         mBingMapKey = key;
     }
 
-	/*-------------- overrides OnlineTileSourceBase ---------------------*/
+    /*-------------- overrides OnlineTileSourceBase ---------------------*/
 
     @Override
     public String getBaseUrl() {
@@ -173,7 +173,7 @@ public class BingMapTileSource extends QuadTreeTileSource implements IStyledTile
         return mImageryData.copyright;
     }
 
-	/*--------------- IStyledTileSource --------------------*/
+    /*--------------- IStyledTileSource --------------------*/
 
     @Override
     /**

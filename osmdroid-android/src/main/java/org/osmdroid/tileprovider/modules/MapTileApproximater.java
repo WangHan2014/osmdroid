@@ -2,9 +2,11 @@ package org.osmdroid.tileprovider.modules;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.BitmapPool;
@@ -14,7 +16,6 @@ import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.MapTileIndex;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -23,8 +24,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * The approximation is based on the tiles of the same region, but on lower zoom level tiles.
  * An obvious use is in offline mode: it's better to display an approximation than an empty grey square.
  *
- * @since 5.6.5
  * @author Fabrice Fontaine
+ * @since 5.6.5
  */
 public class MapTileApproximater extends MapTileModuleProviderBase {
 
@@ -59,7 +60,8 @@ public class MapTileApproximater extends MapTileModuleProviderBase {
         boolean first = true;
         minZoomLevel = OpenStreetMapTileProviderConstants.MINIMUM_ZOOMLEVEL;
         for (final MapTileModuleProviderBase provider : mProviders) {
-            final int otherMin = provider.getMinimumZoomLevel();;
+            final int otherMin = provider.getMinimumZoomLevel();
+            ;
             if (first) {
                 first = false;
                 minZoomLevel = otherMin;
@@ -122,12 +124,12 @@ public class MapTileApproximater extends MapTileModuleProviderBase {
     /**
      * Approximate a tile from a lower zoom level
      *
-     * @since 6.0.0
      * @param pMapTileIndex Destination tile, for the same place on the planet as the source, but on a higher zoom
      * @return
+     * @since 6.0.0
      */
     public Bitmap approximateTileFromLowerZoom(final long pMapTileIndex) {
-        for (int zoomDiff = 1; MapTileIndex.getZoom(pMapTileIndex) - zoomDiff >= OpenStreetMapTileProviderConstants.MINIMUM_ZOOMLEVEL ; zoomDiff ++) {
+        for (int zoomDiff = 1; MapTileIndex.getZoom(pMapTileIndex) - zoomDiff >= OpenStreetMapTileProviderConstants.MINIMUM_ZOOMLEVEL; zoomDiff++) {
             final Bitmap bitmap = approximateTileFromLowerZoom(pMapTileIndex, zoomDiff);
             if (bitmap != null) {
                 return bitmap;
@@ -139,10 +141,10 @@ public class MapTileApproximater extends MapTileModuleProviderBase {
     /**
      * Approximate a tile from a lower zoom level
      *
-     * @since 6.0.0
      * @param pMapTileIndex Destination tile, for the same place on the planet as the source, but on a higher zoom
-     * @param pZoomDiff Zoom level difference between the destination and the source; strictly positive
+     * @param pZoomDiff     Zoom level difference between the destination and the source; strictly positive
      * @return
+     * @since 6.0.0
      */
     public Bitmap approximateTileFromLowerZoom(final long pMapTileIndex, final int pZoomDiff) {
         for (final MapTileModuleProviderBase provider : mProviders) {
@@ -157,11 +159,11 @@ public class MapTileApproximater extends MapTileModuleProviderBase {
     /**
      * Approximate a tile from a lower zoom level
      *
-     * @since 6.0.0
-     * @param pProvider Source tile provider
+     * @param pProvider     Source tile provider
      * @param pMapTileIndex Destination tile, for the same place on the planet as the source, but on a higher zoom
-     * @param pZoomDiff Zoom level difference between the destination and the source; strictly positive
+     * @param pZoomDiff     Zoom level difference between the destination and the source; strictly positive
      * @return
+     * @since 6.0.0
      */
     public static Bitmap approximateTileFromLowerZoom(
             final MapTileModuleProviderBase pProvider,
@@ -180,7 +182,7 @@ public class MapTileApproximater extends MapTileModuleProviderBase {
                 MapTileIndex.getX(pMapTileIndex) >> pZoomDiff,
                 MapTileIndex.getY(pMapTileIndex) >> pZoomDiff);
         try {
-            final Drawable srcDrawable = pProvider.getTileLoader().loadTile(srcTile);
+            final Drawable srcDrawable = pProvider.getTileLoader().loadTileIfReachable(srcTile);
             if (!(srcDrawable instanceof BitmapDrawable)) {
                 return null;
             }
@@ -193,11 +195,11 @@ public class MapTileApproximater extends MapTileModuleProviderBase {
     /**
      * Approximate a tile from a lower zoom level
      *
-     * @since 5.6.5
-     * @param pSrcDrawable Source tile bitmap
+     * @param pSrcDrawable  Source tile bitmap
      * @param pMapTileIndex Destination tile, for the same place on the planet as the source, but on a higher zoom
-     * @param pZoomDiff Zoom level difference between the destination and the source; strictly positive
+     * @param pZoomDiff     Zoom level difference between the destination and the source; strictly positive
      * @return
+     * @since 5.6.5
      */
     public static Bitmap approximateTileFromLowerZoom(
             final BitmapDrawable pSrcDrawable,
@@ -241,13 +243,16 @@ public class MapTileApproximater extends MapTileModuleProviderBase {
 
     /**
      * Try to get a tile bitmap from the pool, otherwise allocate a new one
-     *
-     * @param pTileSizePx
-     * @return
      */
     public static Bitmap getTileBitmap(final int pTileSizePx) {
         final Bitmap bitmap = BitmapPool.getInstance().obtainSizedBitmapFromPool(pTileSizePx, pTileSizePx);
         if (bitmap != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+                // without that, the retrieved bitmap forgets it allowed transparency
+                bitmap.setHasAlpha(true);
+            }
+            // without that, the bitmap keeps its previous contents when transparent content is copied on it
+            bitmap.eraseColor(Color.TRANSPARENT);
             return bitmap;
         }
         return Bitmap.createBitmap(pTileSizePx, pTileSizePx, Bitmap.Config.ARGB_8888);

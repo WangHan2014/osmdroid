@@ -5,7 +5,6 @@ import org.json.JSONObject;
 
 /**
  * ImageryMetaData storage. Class used to decode valid ImageryMetaData.
- *
  */
 public class ImageryMetaData {
 
@@ -61,5 +60,4 @@ public class ImageryMetaData {
 
 		return ImageryMetaDataResource.getInstanceFromJSON(resource,jsonResult);
 	}
-
 }

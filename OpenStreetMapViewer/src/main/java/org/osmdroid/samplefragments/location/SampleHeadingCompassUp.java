@@ -63,7 +63,6 @@ public class SampleHeadingCompassUp extends BaseSampleFragment implements Locati
         overlay.setEnableAutoStop(false);
         overlay.enableFollowLocation();
         overlay.enableMyLocation();
-        mMapView.setBuiltInZoomControls(true);
         this.mMapView.getOverlayManager().add(overlay);
     }
 
@@ -77,7 +76,7 @@ public class SampleHeadingCompassUp extends BaseSampleFragment implements Locati
             //lock the device in current screen orientation
             int orientation;
             int rotation = ((WindowManager) getActivity().getSystemService(
-                Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+                    Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
             switch (rotation) {
                 case Surface.ROTATION_0:
                     orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
@@ -115,7 +114,7 @@ public class SampleHeadingCompassUp extends BaseSampleFragment implements Locati
             //java.lang.IllegalArgumentException: provider doesn't exist: network
             ex.printStackTrace();
         }
-        if (compass==null)
+        if (compass == null)
             compass = new InternalCompassOrientationProvider(getActivity());
         compass.startOrientationProvider(this);
         mMapView.getController().zoomTo(16);
@@ -235,7 +234,7 @@ public class SampleHeadingCompassUp extends BaseSampleFragment implements Locati
                 t = (int) t;
                 t = t * 5;
                 mMapView.setMapOrientation(t);
-                updateDisplay(actualHeading,false);
+                updateDisplay(actualHeading, false);
             }
         }
     }
@@ -249,16 +248,16 @@ public class SampleHeadingCompassUp extends BaseSampleFragment implements Locati
                     public void run() {
                         if (getActivity() != null && textViewCurrentLocation != null) {
                             textViewCurrentLocation.setText("GPS Speed: " + gpsspeed + "m/s  GPS Bearing: " + gpsbearing +
-                                "\nDevice Orientation: " + deviceOrientation + "  Compass heading: " + (int) bearing + "\n" +
-                                "True north: " + trueNorth.intValue() + " Map Orientation: " + (int) mMapView.getMapOrientation() + "\n" +
-                                screen_orientation);
+                                    "\nDevice Orientation: " + deviceOrientation + "  Compass heading: " + (int) bearing + "\n" +
+                                    "True north: " + trueNorth.intValue() + " Map Orientation: " + (int) mMapView.getMapOrientation() + "\n" +
+                                    screen_orientation);
                         }
                     }
                 });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        Log.i(TAG,isGps + ","+gpsspeed + "," + gpsbearing + "," + deviceOrientation + "," + bearing + "," + trueNorth.intValue() + "," + mMapView.getMapOrientation() + "," + screen_orientation);
+        Log.i(TAG, isGps + "," + gpsspeed + "," + gpsbearing + "," + deviceOrientation + "," + bearing + "," + trueNorth.intValue() + "," + mMapView.getMapOrientation() + "," + screen_orientation);
     }
 
 }

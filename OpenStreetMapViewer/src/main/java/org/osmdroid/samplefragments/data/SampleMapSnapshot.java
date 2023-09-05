@@ -2,8 +2,6 @@ package org.osmdroid.samplefragments.data;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * Demo with the new "MapSnapshot" feature - a RecyclerView with bitmap maps of all USA states
+ *
  * @author Fabrice Fontaine
  * @since 6.1.0
  */
@@ -57,8 +59,8 @@ public class SampleMapSnapshot extends BaseSampleFragment {
 
             MyViewHolder(LinearLayout pLinearLayout) {
                 super(pLinearLayout);
-                mImageView = (ImageView)pLinearLayout.getChildAt(0);
-                mTextView = (TextView)pLinearLayout.getChildAt(1);
+                mImageView = (ImageView) pLinearLayout.getChildAt(0);
+                mTextView = (TextView) pLinearLayout.getChildAt(1);
                 mProgressBar = (ProgressBar) pLinearLayout.getChildAt(2);
 
                 pLinearLayout.setOnClickListener(new View.OnClickListener() {
@@ -121,7 +123,7 @@ public class SampleMapSnapshot extends BaseSampleFragment {
                 return; // pending
             }
             final double zoom = mTileSystem.getBoundingBoxZoom(
-                    pDataRegion.getBox(), mMapSize - 2*mBorderSize, mMapSize - 2*mBorderSize);
+                    pDataRegion.getBox(), mMapSize - 2 * mBorderSize, mMapSize - 2 * mBorderSize);
             final MapTileProviderBase mapTileProvider = new MapTileProviderBasic(getActivity());
             final MapSnapshot mapSnapshot = new MapSnapshot(new MapSnapshot.MapSnapshotable() {
                 @Override
@@ -144,7 +146,7 @@ public class SampleMapSnapshot extends BaseSampleFragment {
                     });
                 }
             }, MapSnapshot.INCLUDE_FLAG_UPTODATE, mapTileProvider, mOverlays,
-                    new Projection(zoom, mMapSize, mMapSize, pDataRegion.getBox().getCenterWithDateLine(), 0, true, true));
+                    new Projection(zoom, mMapSize, mMapSize, pDataRegion.getBox().getCenterWithDateLine(), 0, true, true, 0, 0));
             mMapSnapshots.put(key, mapSnapshot);
             new Thread(mapSnapshot).start(); // TODO use AsyncTask, Executors instead?
         }
@@ -180,7 +182,7 @@ public class SampleMapSnapshot extends BaseSampleFragment {
             final DataRegionLoader dataRegionLoader = new DataRegionLoader(getActivity(), R.raw.data_region_usstates);
             mAdapter = new MyAdapter(new ArrayList<>(dataRegionLoader.getList().values()));
             recyclerView.setAdapter(mAdapter);
-        } catch(Exception e) {
+        } catch (Exception e) {
             // DataRegionLoader KO, not supposed to happen
         }
 

@@ -10,7 +10,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
@@ -30,12 +29,14 @@ import org.osmdroid.views.overlay.compass.IOrientationProvider;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import androidx.core.app.ActivityCompat;
+
 /**
  * http://stackoverflow.com/q/40112165/1203182
  * Created by alex on 10/21/16.
  */
 
-public class WeathForceActivity extends BaseActivity implements LocationListener, IOrientationConsumer,MapEventsReceiver {
+public class WeathForceActivity extends BaseActivity implements LocationListener, IOrientationConsumer, MapEventsReceiver {
     final String TAG = "WeathForceActivity";
     private CompassOverlay mCompassOverlay = null;
     private MyLocationNewOverlay mLocationOverlay;
@@ -95,7 +96,6 @@ public class WeathForceActivity extends BaseActivity implements LocationListener
         mLocationOverlay.enableFollowLocation();
         mLocationOverlay.enableMyLocation();
         this.mMapView.getOverlayManager().add(mLocationOverlay);
-        mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
         mMapView.setTilesScaledToDpi(true);
     }
@@ -201,7 +201,7 @@ public class WeathForceActivity extends BaseActivity implements LocationListener
 
         GeomagneticField gf = new GeomagneticField(lat, lon, alt, timeOfFix);
         trueNorth = orientationToMagneticNorth + gf.getDeclination();
-        gf=null;
+        gf = null;
         synchronized (trueNorth) {
             if (trueNorth > 360.0f) {
                 trueNorth = trueNorth - 360.0f;
@@ -233,11 +233,11 @@ public class WeathForceActivity extends BaseActivity implements LocationListener
             this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (this!=null ) {
+                    if (this != null) {
                         Log.i(TAG
                                 , "GPS Speed: " + gpsspeed + "m/s  GPS Bearing: " + gpsbearing +
-                                "\nDevice Orientation: " + deviceOrientation + "  Compass heading: " + (int) orientationToMagneticNorth + "\n" +
-                                "True north: " + trueNorth.intValue() + " Map Orientation: " + (int) mMapView.getMapOrientation());
+                                        "\nDevice Orientation: " + deviceOrientation + "  Compass heading: " + (int) orientationToMagneticNorth + "\n" +
+                                        "True north: " + trueNorth.intValue() + " Map Orientation: " + (int) mMapView.getMapOrientation());
                     }
                 }
             });

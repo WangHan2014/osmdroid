@@ -1,6 +1,5 @@
 package org.osmdroid.debug.browser;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -11,16 +10,19 @@ import org.osmdroid.debug.model.SqlTileWriterExt;
 import org.osmdroid.debug.util.FileDateUtil;
 import org.osmdroid.intro.StorageAdapter;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 /**
  * A simple view for browsing the osmdroid tile cache database
  * created on 12/20/2016.
  *
- * @see org.osmdroid.debug.CacheAnalyzerActivity
  * @author Alex O'Ree
+ * @see org.osmdroid.debug.CacheAnalyzerActivity
  * @since 5.6.2
  */
 
-public class CacheBrowserActivity extends Activity {
+public class CacheBrowserActivity extends AppCompatActivity {
     SqlTileWriterExt cache = null;
 
     @Override
@@ -28,6 +30,18 @@ public class CacheBrowserActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cache_browser);
 
+        Toolbar toolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
+
+        //noinspection ConstantConditions
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     public void onResume() {
@@ -40,7 +54,7 @@ public class CacheBrowserActivity extends Activity {
         lv.setAdapter(adapter);
 
         ((TextView) findViewById(R.id.rows)).setText(cache.getRowCount(null) + "");
-        ((TextView) findViewById(R.id.size)).setText(StorageAdapter.readableFileSize(MainActivity.updateStoragePrefreneces(this)));
+        ((TextView) findViewById(R.id.size)).setText(StorageAdapter.readableFileSize(MainActivity.updateStoragePreferences(this)));
         ((TextView) findViewById(R.id.date)).setText("Now " + FileDateUtil.getModifiedDate(System.currentTimeMillis()));
     }
 

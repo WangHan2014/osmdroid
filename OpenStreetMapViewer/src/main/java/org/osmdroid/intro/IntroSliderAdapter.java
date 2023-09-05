@@ -1,9 +1,10 @@
 package org.osmdroid.intro;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 /**
  * Created by alex on 10/22/16.
@@ -18,13 +19,19 @@ public class IntroSliderAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        switch (position){
-            case 0: return new LogoFragment();
-            case 1: return new AboutFragment();
-            case 2: return new PermissionsFragment();
-            case 3: return new StoragePreferenceFragment();
-            case 4: return new DataUseWarning();
-            case 5: return new TileSourceWarnings();
+        switch (position) {
+            case 0:
+                return new LogoFragment();
+            case 1:
+                return new AboutFragment();
+            case 2:
+                return new PermissionsFragment();
+            case 3:
+                return new StoragePreferenceFragment();
+            case 4:
+                return new DataUseWarning();
+            case 5:
+                return new TileSourceWarnings();
         }
         return null;
     }
@@ -36,7 +43,7 @@ public class IntroSliderAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        super.setPrimaryItem(container,position,object);
+        super.setPrimaryItem(container, position, object);
         System.out.println("New pager is " + position);
 
     }

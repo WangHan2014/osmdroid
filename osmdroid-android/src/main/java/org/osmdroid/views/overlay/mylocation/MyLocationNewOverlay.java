@@ -30,105 +30,108 @@ import org.osmdroid.views.overlay.Overlay.Snappable;
 import java.util.LinkedList;
 
 /**
- * 
  * @author Marc Kurtz
  * @author Manuel Stahl
- * 
  */
 public class MyLocationNewOverlay extends Overlay implements IMyLocationConsumer,
-		IOverlayMenuProvider, Snappable {
+        IOverlayMenuProvider, Snappable {
 
-	// ===========================================================
-	// Constants
-	// ===========================================================
+    // ===========================================================
+    // Constants
+    // ===========================================================
 
-	// ===========================================================
-	// Fields
-	// ===========================================================
+    // ===========================================================
+    // Fields
+    // ===========================================================
 
-	protected Paint mPaint = new Paint();
-	protected Paint mCirclePaint = new Paint();
-
-	protected final float mScale;
+    protected Paint mPaint = new Paint();
+    protected Paint mCirclePaint = new Paint();
 
 	protected Bitmap mPersonBitmap;
 	protected Bitmap mDirectionArrowBitmap;
 
-	protected MapView mMapView;
+    protected MapView mMapView;
 
-	private IMapController mMapController;
-	public IMyLocationProvider mMyLocationProvider;
+    private IMapController mMapController;
+    public IMyLocationProvider mMyLocationProvider;
 
-	private final LinkedList<Runnable> mRunOnFirstFix = new LinkedList<Runnable>();
-	private final Point mDrawPixel = new Point();
-	private final Point mSnapPixel = new Point();
-	private Handler mHandler;
-	private Object mHandlerToken = new Object();
+    private final LinkedList<Runnable> mRunOnFirstFix = new LinkedList<Runnable>();
+    private final Point mDrawPixel = new Point();
+    private final Point mSnapPixel = new Point();
+    private Handler mHandler;
+    private Object mHandlerToken = new Object();
 
-	/**
-	 * if true, when the user pans the map, follow my location will automatically disable
-	 * if false, when the user pans the map, the map will continue to follow current location
-	 */
-	protected boolean enableAutoStop=true;
-	private Location mLocation;
-	private final GeoPoint mGeoPoint = new GeoPoint(0, 0); // for reuse
-	private boolean mIsLocationEnabled = false;
-	protected boolean mIsFollowing = false; // follow location updates
-	protected boolean mDrawAccuracyEnabled = true;
+    /**
+     * if true, when the user pans the map, follow my location will automatically disable
+     * if false, when the user pans the map, the map will continue to follow current location
+     */
+    protected boolean enableAutoStop = true;
+    private Location mLocation;
+    private final GeoPoint mGeoPoint = new GeoPoint(0, 0); // for reuse
+    private boolean mIsLocationEnabled = false;
+    protected boolean mIsFollowing = false; // follow location updates
+    protected boolean mDrawAccuracyEnabled = true;
 
-	/** Coordinates the feet of the person are located scaled for display density. */
-	protected final PointF mPersonHotspot;
+    /**
+     * Coordinates the feet of the person are located scaled for display density.
+     */
+    protected final PointF mPersonHotspot;
 
-	protected float mDirectionArrowCenterX;
-	protected float mDirectionArrowCenterY;
+    protected float mDirectionArrowCenterX;
+    protected float mDirectionArrowCenterY;
 
-	public static final int MENU_MY_LOCATION = getSafeMenuId();
+    public static final int MENU_MY_LOCATION = getSafeMenuId();
 
-	private boolean mOptionsMenuEnabled = true;
+    private boolean mOptionsMenuEnabled = true;
 
-	private boolean wasEnabledOnPause=false;
-	// ===========================================================
-	// Constructors
-	// ===========================================================
+    private boolean wasEnabledOnPause = false;
+    // ===========================================================
+    // Constructors
+    // ===========================================================
 
-	public MyLocationNewOverlay(MapView mapView) {
-		this(new GpsMyLocationProvider(mapView.getContext()), mapView);
-	}
+    public MyLocationNewOverlay(MapView mapView) {
+        this(new GpsMyLocationProvider(mapView.getContext()), mapView);
+    }
 
 	public MyLocationNewOverlay(IMyLocationProvider myLocationProvider, MapView mapView) {
 		super();
-		mScale = mapView.getContext().getResources().getDisplayMetrics().density;
 
-		mMapView = mapView;
-		mMapController = mapView.getController();
-		mCirclePaint.setARGB(0, 100, 100, 255);
-		mCirclePaint.setAntiAlias(true);
-		mPaint.setFilterBitmap(true);
+        mMapView = mapView;
+        mMapController = mapView.getController();
+        mCirclePaint.setARGB(0, 100, 100, 255);
+        mCirclePaint.setAntiAlias(true);
+        mPaint.setFilterBitmap(true);
 
 
-		setDirectionArrow(((BitmapDrawable)mapView.getContext().getResources().getDrawable(R.drawable.person)).getBitmap(),
-				((BitmapDrawable)mapView.getContext().getResources().getDrawable(R.drawable.round_navigation_white_48)).getBitmap());
+		setPersonIcon(((BitmapDrawable)mapView.getContext().getResources().getDrawable(R.drawable.person)).getBitmap());
+		setDirectionIcon(((BitmapDrawable)mapView.getContext().getResources().getDrawable(R.drawable.round_navigation_white_48)).getBitmap());
 
 		// Calculate position of person icon's feet, scaled to screen density
-		mPersonHotspot = new PointF(24.0f * mScale + 0.5f, 39.0f * mScale + 0.5f);
+		mPersonHotspot = new PointF();
+		setPersonAnchor(.5f, .8125f); // anchor for the default icon
+		setDirectionAnchor(.5f, .5f); // anchor for the default icon
 
-		mHandler = new Handler(Looper.getMainLooper());
-		setMyLocationProvider(myLocationProvider);
-	}
+        mHandler = new Handler(Looper.getMainLooper());
+        setMyLocationProvider(myLocationProvider);
+    }
 
 	/**
 	 * fix for https://github.com/osmdroid/osmdroid/issues/249
-	 * @param personBitmap
-	 * @param directionArrowBitmap
+	 * @deprecated Use {@link #setPersonIcon(Bitmap)}, {@link #setDirectionIcon(Bitmap)},
+	 * {@link #setPersonAnchor(float, float)} and {@link #setDirectionAnchor(float, float)} instead
      */
+	@Deprecated
 	public void setDirectionArrow(final Bitmap personBitmap, final Bitmap directionArrowBitmap){
-		this.mPersonBitmap = personBitmap;
-		this.mDirectionArrowBitmap=directionArrowBitmap;
+		setPersonIcon(personBitmap);
+		setDirectionIcon(directionArrowBitmap);
+		setDirectionAnchor(.5f, .5f);
+	}
 
-
-		mDirectionArrowCenterX = mDirectionArrowBitmap.getWidth() / 2.0f - 0.5f;
-		mDirectionArrowCenterY = mDirectionArrowBitmap.getHeight() / 2.0f - 0.5f;
-
+	/**
+	 * @since 6.2.0
+	 */
+	public void setDirectionIcon(final Bitmap pDirectionArrowBitmap){
+		mDirectionArrowBitmap = pDirectionArrowBitmap;
 	}
 
 	@Override
@@ -208,6 +211,10 @@ public class MyLocationNewOverlay extends Overlay implements IMyLocationConsumer
 		mMyLocationProvider = myLocationProvider;
 	}
 
+	/**
+	 * @deprecated Use {@link #setPersonAnchor(float, float)} instead
+	 */
+	@Deprecated
 	public void setPersonHotspot(float x, float y) {
 		mPersonHotspot.set(x, y);
 	}
@@ -294,9 +301,12 @@ public class MyLocationNewOverlay extends Overlay implements IMyLocationConsumer
 
 	@Override
 	public boolean onTouchEvent(final MotionEvent event, final MapView mapView) {
+		final boolean isSingleFingerDrag = (event.getAction() == MotionEvent.ACTION_MOVE)
+				&& (event.getPointerCount() == 1);
+
 		if (event.getAction() == MotionEvent.ACTION_DOWN && enableAutoStop) {
 			this.disableFollowLocation();
-		} else if (event.getAction() == MotionEvent.ACTION_MOVE && isFollowLocationEnabled()) {
+		} else if (isSingleFingerDrag && isFollowLocationEnabled()) {
 			return true;  // prevent the pan
 		}
 
@@ -400,7 +410,8 @@ public class MyLocationNewOverlay extends Overlay implements IMyLocationConsumer
 	 * Disables "follow" functionality.
 	 */
 	public void disableFollowLocation() {
-		mMapController.stopAnimation(false);
+		if (mMapController!=null)
+			mMapController.stopAnimation(false);
 		mIsFollowing = false;
 	}
 
@@ -528,12 +539,29 @@ public class MyLocationNewOverlay extends Overlay implements IMyLocationConsumer
 	}
      
      /**
-      * enabls you to change the my location 'person' icon at runtime. note that the
-      * hotspot is not updated with this method. see 
-      * {@link #setPersonHotspot}
-      * @param icon 
+      * enables you to change the my location 'person' icon at runtime. note that the
+      * hotspot is not updated with this method. see {@link #setPersonAnchor(float, float)}
       */
      public void setPersonIcon(Bitmap icon){
           mPersonBitmap = icon;
      }
+
+	/**
+	 * Anchors for the person icon
+	 * Expected values between 0 and 1, 0 being top/left, .5 center and 1 bottom/right
+	 * @since 6.2.0
+	 */
+	public void setPersonAnchor(final float pHorizontal, final float pVertical){
+		mPersonHotspot.set(mPersonBitmap.getWidth() * pHorizontal, mPersonBitmap.getHeight() * pVertical);
+	}
+
+	/**
+	 * Anchors for the direction icon
+	 * Expected values between 0 and 1, 0 being top/left, .5 center and 1 bottom/right
+	 * @since 6.2.0
+	 */
+	public void setDirectionAnchor(final float pHorizontal, final float pVertical){
+		mDirectionArrowCenterX = mDirectionArrowBitmap.getWidth() * pHorizontal;
+		mDirectionArrowCenterY = mDirectionArrowBitmap.getHeight() * pVertical;
+	}
 }

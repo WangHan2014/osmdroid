@@ -1,6 +1,5 @@
 package org.osmdroid.samplefragments.layouts.list;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +10,11 @@ import org.osmdroid.samplefragments.layouts.list.dummy.DummyContent.DummyItem;
 
 import java.util.List;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- 99% is this is boiler plate android studio generated stuff
+ * 99% is this is boiler plate android studio generated stuff
  */
 public class MyStreetAddressRecyclerViewAdapter extends RecyclerView.Adapter<MyStreetAddressRecyclerViewAdapter.ViewHolder> {
 
@@ -27,7 +28,7 @@ public class MyStreetAddressRecyclerViewAdapter extends RecyclerView.Adapter<MyS
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.fragment_streetaddress, parent, false);
+                .inflate(R.layout.fragment_streetaddress, parent, false);
 
         return new ViewHolder(view);
     }

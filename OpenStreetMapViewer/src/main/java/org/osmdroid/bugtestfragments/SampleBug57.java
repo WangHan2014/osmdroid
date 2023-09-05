@@ -1,7 +1,6 @@
 package org.osmdroid.bugtestfragments;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +12,12 @@ import org.osmdroid.R;
 import org.osmdroid.samplefragments.BaseSampleFragment;
 import org.osmdroid.views.MapView;
 
+import androidx.fragment.app.FragmentManager;
+
 
 /**
  * https://github.com/osmdroid/osmdroid/issues/57
- *
+ * <p>
  * load the map, then navigate to a different fragment, then hit the back button
  * Created by alex on 7/5/16.
  */
@@ -26,6 +27,7 @@ public class SampleBug57 extends BaseSampleFragment implements View.OnClickListe
     public String getSampleTitle() {
         return "Recovery from backstack";
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
